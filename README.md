@@ -1,6 +1,6 @@
-## Fabric JS Core
+## Warp JS Core
 
-This package contains shared business logic between our Fabric JS implementations: [Web Components](https://github.com/fabric-ds/elements), [React](https://github.com/fabric-ds/react) and [Vue](https://github.com/fabric-ds/vue).
+This package contains shared business logic between our Warp JS implementations: [Web Components](https://github.com/warp-ds/elements), [React](https://github.com/warp-ds/react) and [Vue](https://github.com/warp-ds/vue).
 
 ### Goals
 
