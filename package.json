@@ -1,0 +1,43 @@
+{
+  "name": "@fabric-ds/core",
+  "description": "Shared business logic for JS implementations of Fabric Design System",
+  "version": "0.0.15",
+  "type": "module",
+  "exports": {
+    "./*": "./dist/*/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "breadcrumbs": [
+        "./dist/breadcrumbs/index.d.ts"
+      ],
+      "slider": [
+        "./dist/slider/index.d.ts"
+      ],
+      "attention": [
+        "./dist/attention/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"no tests\"",
+    "preversion": "npm run test && npm run build",
+    "postversion": "npm publish && git push --follow-tags"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@floating-ui/dom": "^0.5.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
+  }
+}
