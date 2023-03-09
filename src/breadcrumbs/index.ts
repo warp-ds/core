@@ -1,5 +1,5 @@
 /**
- * Inject a seperator between each item in a list
+ * Inject a separator between each item in a list
  * @param array List of items
  * @param separator Element to be interleaved between each item
  * @returns
