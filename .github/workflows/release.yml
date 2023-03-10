@@ -15,12 +15,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: current
-      - uses: pnpm/action-setup@v2
+      - name: Install pnpm and dependencies
+        uses: pnpm/action-setup@v2
         with:
           version: 7
           run_install: true
-      - name: Install dependencies
-        run: pnpm install
       - name: Build
         run: pnpm build
       - name: Release
