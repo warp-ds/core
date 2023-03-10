@@ -30,7 +30,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "@floating-ui/dom": "^0.5.0"
   },
