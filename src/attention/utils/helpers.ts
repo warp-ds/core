@@ -1,4 +1,4 @@
-import { ReferenceElement } from "@floating-ui/core";
+import { ReferenceElement } from "@floating-ui/dom";
 import { computePosition, flip, offset, shift, arrow } from "@floating-ui/dom";
 
 const TOP = "top";
