@@ -1,0 +1,16 @@
+name: Update alpha
+on:
+  push:
+    branches:
+      - main
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Rebase alpha to main
+        run: |
+          git fetch --unshallow
+          git checkout alpha
+          git rebase origin/main
+          git push
