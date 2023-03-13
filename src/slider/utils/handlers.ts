@@ -67,11 +67,11 @@ export function createHandlers({
     if (!validKeyCodes.includes(key)) return;
     e.preventDefault();
     if (
-      [validKeys.left, validKeys.right, validKeys.up, validKeys.down].includes(
+        ([validKeys.left, validKeys.right, validKeys.up, validKeys.down] as ElementType<typeof validKeyCodes>[]).includes(
         key
       )
     ) {
-      const direction = [validKeys.right, validKeys.up].includes(key) ? 1 : -1;
+      const direction = ([validKeys.right, validKeys.up] as ElementType<typeof validKeyCodes>[]).includes(key) ? 1 : -1;
       sliderState.position = clampedChange(
         sliderState.val + direction * sliderState.step
       );
