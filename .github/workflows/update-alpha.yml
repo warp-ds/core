@@ -10,7 +10,8 @@ jobs:
   rebase:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Rebase alpha to main
         run: |
           git fetch --unshallow
