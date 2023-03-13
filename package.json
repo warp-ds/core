@@ -1,5 +1,6 @@
 {
   "name": "@warp-ds/core",
+  "repository": "git@github.com:warp-ds/core.git",
   "description": "Shared business logic for JS implementations of Warp Design System",
   "version": "0.0.1",
   "type": "module",
@@ -23,21 +24,29 @@
     "dist"
   ],
   "scripts": {
+    "commit": "cz",
     "build": "tsc",
-    "test": "echo \"no tests\"",
-    "preversion": "npm run test && npm run build",
-    "postversion": "npm publish && git push --follow-tags"
+    "test": "echo \"no tests\""
   },
   "keywords": [],
   "author": "",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "@floating-ui/dom": "^0.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4",
+    "@semantic-release/changelog": "github:semantic-release/changelog",
+    "@semantic-release/git": "github:semantic-release/git",
+    "semantic-release": "^20.1.1",
+    "cz-conventional-changelog": "^3.3.0"
   },
   "publishConfig": {
     "access": "public"
   },
-  "devDependencies": {
-    "typescript": "^4.7.4"
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
