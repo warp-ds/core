@@ -10,6 +10,18 @@
 
 * automate package publishing using semantic-release ([#3](https://github.com/warp-ds/core/issues/3)) ([340b82e](https://github.com/warp-ds/core/commit/340b82e971b5ae9ab43e99755bf658e926f52d55))
 
+# 1.0.0-alpha.1 (2023-03-15)
+
+
+### Bug Fixes
+
+* Fixed build errors ([#5](https://github.com/warp-ds/core/issues/5)) ([c422e5f](https://github.com/warp-ds/core/commit/c422e5f8ed04646f309dd6e62d5275d2e4cc81cc))
+
+
+### Features
+
+* automate package publishing using semantic-release ([#3](https://github.com/warp-ds/core/issues/3)) ([340b82e](https://github.com/warp-ds/core/commit/340b82e971b5ae9ab43e99755bf658e926f52d55))
+
 # 1.0.0-alpha.1 (2023-03-13)
 
 
