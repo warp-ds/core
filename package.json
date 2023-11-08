@@ -2,7 +2,7 @@
   "name": "@warp-ds/core",
   "repository": "git@github.com:warp-ds/core.git",
   "description": "Shared business logic for JS implementations of Warp Design System",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "exports": {
     "./*": "./dist/*/index.js"

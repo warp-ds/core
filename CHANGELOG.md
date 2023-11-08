@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/warp-ds/core/compare/v1.0.0...v1.0.1) (2023-11-08)
+
+
+### Bug Fixes
+
+* Add accelerated slider movement when using keyboard to change Slider value ([#11](https://github.com/warp-ds/core/issues/11)) ([3524cf3](https://github.com/warp-ds/core/commit/3524cf36a5b04040d72d3d7e9060d232a12eb0b3))
+
 # 1.0.0 (2023-03-20)
 
 
