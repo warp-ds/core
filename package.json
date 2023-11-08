@@ -36,9 +36,9 @@
   },
   "devDependencies": {
     "typescript": "^4.7.4",
-    "@semantic-release/changelog": "github:semantic-release/changelog",
-    "@semantic-release/git": "github:semantic-release/git",
-    "semantic-release": "^20.1.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "semantic-release": "^22.0.7",
     "cz-conventional-changelog": "^3.3.0"
   },
   "publishConfig": {
