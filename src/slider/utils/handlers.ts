@@ -5,9 +5,10 @@ import {
   clamp,
   roundDecimals,
   ElementType,
-} from "./helpers.js";
+} from './helpers.js';
 
 type ClickEvent = TouchEvent | MouseEvent;
+
 export type Dimensions = {
   left: number;
   width: number;
@@ -20,6 +21,7 @@ interface SliderProps {
   disabled?: boolean;
   label?: string;
   labelledBy?: string;
+  preventAcceleration?: boolean;
 }
 
 interface SliderState {
@@ -31,21 +33,14 @@ interface SliderState {
   thumbEl: HTMLDivElement | null;
 }
 
-export function createHandlers({
-  props,
-  sliderState,
-}: {
-  props: SliderProps;
-  sliderState: SliderState;
-}) {
+export function createHandlers({ props, sliderState }: { props: SliderProps; sliderState: SliderState; }) {
   const clampedChange = (n: number) =>
     clamp(n, { max: props.max, min: props.min });
 
   function getCoordinates(e: ClickEvent) {
     const { left: offsetLeft, width: trackWidth } = sliderState.dimensions;
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    let left =
-      Math.min(Math.max((clientX - offsetLeft - 16) / trackWidth, 0), 1) || 0;
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    let left = Math.min(Math.max((clientX - offsetLeft - 16) / trackWidth, 0), 1) || 0;
     const value = props.min + left * (props.max - props.min);
     return { value };
   }
@@ -61,54 +56,80 @@ export function createHandlers({
     return Math.floor(n * r) / r;
   };
 
+  const keydownRepeat = {
+    counter: 0,
+    repeatsBeforeAcceleration: 3
+  }
+
   function handleKeyDown(e: KeyboardEvent) {
     const key = e.key as ElementType<typeof validKeyCodes>;
 
     if (!validKeyCodes.includes(key)) return;
     e.preventDefault();
-    if (
-        ([validKeys.left, validKeys.right, validKeys.up, validKeys.down] as ElementType<typeof validKeyCodes>[]).includes(
-        key
-      )
-    ) {
-      const direction = ([validKeys.right, validKeys.up] as ElementType<typeof validKeyCodes>[]).includes(key) ? 1 : -1;
-      sliderState.position = clampedChange(
-        sliderState.val + direction * sliderState.step
-      );
-    } else if (key === validKeys.home) {
-      sliderState.position = props.min;
-    } else if (key === validKeys.end) {
-      sliderState.position = props.max;
-    } else {
-      const direction = key === validKeys.pageup ? 1 : -1;
-      const minStepMultiplier = 2;
-      const maxStepMultiplier = 50;
-      sliderState.position = clampedChange(
-        sliderState.val +
+
+    switch (key) {
+      case validKeys.left:
+      case validKeys.right:
+      case validKeys.up:
+      case validKeys.down: {
+        const direction = (key === validKeys.right || key === validKeys.up) ? 1 : -1;
+        let stepsToMove = sliderState.step;
+        if (!props.preventAcceleration) {
+          if (e.repeat) {
+            keydownRepeat.counter++;
+            const acceleratedStepPercentage = Math.min((keydownRepeat.counter - keydownRepeat.repeatsBeforeAcceleration) / 100, .2);
+            stepsToMove = Math.max(
+                sliderState.step,
+                Math.ceil((direction > 0 ? props.max - sliderState.val : sliderState.val - props.min) * acceleratedStepPercentage)
+            );
+          } else {
+            keydownRepeat.counter = 0;
+          }
+        }
+        sliderState.position = clampedChange(sliderState.val + direction * stepsToMove);
+        break;
+      }
+      case validKeys.home:
+        sliderState.position = props.min;
+        break;
+      case validKeys.end:
+        sliderState.position = props.max;
+        break;
+      case validKeys.pageup:
+      case validKeys.pagedown: {
+        const direction = key === validKeys.pageup ? 1 : -1;
+        const minStepMultiplier = 2;
+        const maxStepMultiplier = 50;
+        sliderState.position = clampedChange(
+          sliderState.val +
           direction *
-            sliderState.step *
-            Math.max(
-              minStepMultiplier,
-              Math.min(
-                maxStepMultiplier,
-                Math.ceil((props.max - props.min) / 10 / sliderState.step)
-              )
+          sliderState.step *
+          Math.max(
+            minStepMultiplier,
+            Math.min(
+              maxStepMultiplier,
+              Math.ceil((props.max - props.min) / 10 / sliderState.step)
             )
-      );
+          )
+        );
+        break;
+      }
+      default:
+        break;
     }
   }
 
-  function handleFocus(e: FocusEvent | unknown): void {}
-  function handleBlur(e: FocusEvent | unknown): void {}
+  function handleFocus(): void {}
+  function handleBlur(): void {}
 
   function handleMouseDown(e: KeyboardEvent) {
     sliderState.sliderPressed = true;
-    if ("touches" in e) {
-      window.addEventListener("touchmove", handleMouseChange, eventOptions);
-      window.addEventListener("touchend", handleMouseUp, { once: true });
+    if ('touches' in e) {
+      window.addEventListener('touchmove', handleMouseChange, eventOptions);
+      window.addEventListener('touchend', handleMouseUp, { once: true });
     } else {
-      window.addEventListener("mousemove", handleMouseChange, eventOptions);
-      window.addEventListener("mouseup", handleMouseUp, { once: true });
+      window.addEventListener('mousemove', handleMouseChange, eventOptions);
+      window.addEventListener('mouseup', handleMouseUp, { once: true });
     }
     e.stopPropagation();
     e.preventDefault();
@@ -117,8 +138,8 @@ export function createHandlers({
   // we don't return this function, it's called via mouseDown's addEventListener
   function handleMouseUp() {
     sliderState.sliderPressed = false;
-    window.removeEventListener("touchmove", handleMouseChange);
-    window.removeEventListener("mousemove", handleMouseChange);
+    window.removeEventListener('touchmove', handleMouseChange);
+    window.removeEventListener('mousemove', handleMouseChange);
   }
 
   function handleClick(e: ClickEvent | unknown) {
@@ -129,8 +150,7 @@ export function createHandlers({
     const { value } = getCoordinates(e as ClickEvent);
     const n = roundDecimals(value);
     sliderState.thumbEl?.focus();
-    if (sliderState.position === n) return;
-    sliderState.position = n;
+    if (sliderState.position !== n) sliderState.position = n;
   }
 
   return {
