@@ -64,7 +64,7 @@ export function createHandlers({ props, sliderState }: { props: SliderProps; sli
   function handleKeyDown(e: KeyboardEvent) {
     const key = e.key as ElementType<typeof validKeyCodes>;
 
-    if (!validKeyCodes.includes(key)) return;
+    if (props.disabled || !validKeyCodes.includes(key)) return;
     e.preventDefault();
 
     switch (key) {
