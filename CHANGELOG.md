@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/warp-ds/core/compare/v1.0.1...v1.0.2) (2023-11-08)
+
+
+### Bug Fixes
+
+* Prevent keydown events affecting disabled Slider ([#14](https://github.com/warp-ds/core/issues/14)) ([82d93ba](https://github.com/warp-ds/core/commit/82d93ba51f9c6eaa9fb5ac6778a2ba8b95616527))
+
 ## [1.0.1](https://github.com/warp-ds/core/compare/v1.0.0...v1.0.1) (2023-11-08)
 
 
