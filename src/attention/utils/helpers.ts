@@ -1,29 +1,74 @@
 import { computePosition, flip, offset, shift, arrow, ReferenceElement } from "@floating-ui/dom";
 
+const TOPSTART = "top-start";
 const TOP = "top";
-const BOTTOM = "bottom";
-const LEFT = "left";
+const TOPEND = "top-end";
+const RIGHTSTART = "right-start";
 const RIGHT = "right";
-type Directions = "top" | "right" | "bottom" | "left";
+const RIGHTEND ="right-end";
+const BOTTOMSTART = "bottom-start";
+const BOTTOM = "bottom";
+const BOTTOMEND = "bottom-end"
+const LEFTSTART = "left-start";
+const LEFT = "left";
+const LEFTEND = "left-end";
+
+type Directions =   | 'top'
+| 'top-start'
+| 'top-end'
+| 'right'
+| 'right-start'
+| 'right-end'
+| 'bottom'
+| 'bottom-start'
+| 'bottom-end'
+| 'left'
+| 'left-start'
+| 'left-end';
 
 export const opposites = {
+  [TOPSTART]: BOTTOMSTART,
   [TOP]: BOTTOM,
+  [TOPEND]: BOTTOMEND,
+  [BOTTOMSTART]: TOPSTART,
   [BOTTOM]: TOP,
+  [BOTTOMEND]: TOPEND,
+  [LEFTSTART]: RIGHTSTART,
   [LEFT]: RIGHT,
+  [LEFTEND]: RIGHTEND,
+  [RIGHTSTART]: LEFTSTART,
   [RIGHT]: LEFT,
+  [RIGHTEND]: LEFTEND,
 };
 export const arrowLabels = {
+  [TOPSTART]: "↑",
   [TOP]: "↑",
+  [TOPEND]: "↑",
+  [BOTTOMSTART]: "↓",
   [BOTTOM]: "↓",
+  [BOTTOMEND]: "↓",
+  [LEFTSTART]: "←",
   [LEFT]: "←",
+  [LEFTEND]: "←",
+  [RIGHTSTART]: "→",
   [RIGHT]: "→",
+  [RIGHTEND]: "→",
+
 };
-export const directions = [TOP, BOTTOM, LEFT, RIGHT];
+export const directions = [TOPSTART, TOP, TOPEND, BOTTOMSTART, BOTTOM, BOTTOMEND, LEFTSTART, LEFT, LEFTEND, RIGHTSTART, RIGHT, RIGHTEND];
 export const rotation = {
+  [LEFTSTART]: -45,
   [LEFT]: -45,
+  [LEFTEND]: -45,
+  [TOPSTART]: 45,
   [TOP]: 45,
+  [TOPEND]: 45,
+  [RIGHTSTART]: 135,
   [RIGHT]: 135,
+  [RIGHTEND]: 135,
+  [BOTTOMSTART]: -135,
   [BOTTOM]: -135,
+  [BOTTOMEND]: -135,
 };
 
 export type AttentionState = {
@@ -62,7 +107,7 @@ function computeCalloutArrow({
 
 export async function useRecompute(state: AttentionState) {
   if (!state.isShowing) return; // we're not currently showing the element, no reason to recompute
-  await state?.waitForDOM?.(); // wait for DOM to settle before computing
+  state?.waitForDOM?.(); // wait for DOM to settle before computing
   if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box, only its arrow
   const position = await computePosition(
     state.targetEl as ReferenceElement,
@@ -80,13 +125,13 @@ export async function useRecompute(state: AttentionState) {
     }
   );
   // @ts-ignore
-  state.actualDirection = position.placement;
+ state.actualDirection = position.placement;
   Object.assign(state.attentionEl?.style || {}, {
-    left: "0",
-    top: "0",
-    transform: `translate3d(${Math.round(position.x)}px, ${Math.round(
-      position.y
-    )}px, 0)`,
+    left: `${position.x}px`,
+    top: `${position.y}px`,
+    // transform: `translate3d(${Math.round(position.x)}px, ${Math.round(
+    //   position.y
+    // )}px, 0)`,
   });
   // @ts-ignore
   let { x, y } = position.middlewareData.arrow;
