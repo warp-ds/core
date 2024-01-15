@@ -79,10 +79,18 @@ export type AttentionState = {
   arrowEl?: HTMLElement | null;
   attentionEl?: HTMLElement | null;
   targetEl?: unknown;
+  topStart?: Boolean; 
   top?: Boolean;
+  topEnd?: Boolean;
+  rightStart?: Boolean;
   right?: Boolean;
+  rightEnd?: Boolean;
+  bottomStart?: Boolean;
   bottom?: Boolean;
+  bottomEnd?: Boolean;
+  leftStart?: Boolean;
   left?: Boolean;
+  leftEnd?: Boolean;
   tooltip?: Boolean;
   popover?: Boolean;
   callout?: Boolean;
@@ -91,7 +99,7 @@ export type AttentionState = {
 };
 
 const middlePosition = "calc(50% - 7px)";
-const isDirectionVertical = (name: string) => [TOP, BOTTOM].includes(name);
+const isDirectionVertical = (name: string) => [TOPSTART, TOP, TOPEND, BOTTOMSTART, BOTTOM, BOTTOMEND].includes(name);
 function computeCalloutArrow({
   actualDirection,
   directionName,
@@ -108,7 +116,7 @@ function computeCalloutArrow({
 export async function useRecompute(state: AttentionState) {
   if (!state.isShowing) return; // we're not currently showing the element, no reason to recompute
   state?.waitForDOM?.(); // wait for DOM to settle before computing
-  if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box, only its arrow
+  if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
   const position = await computePosition(
     state.targetEl as ReferenceElement,
     state.attentionEl as HTMLElement,
