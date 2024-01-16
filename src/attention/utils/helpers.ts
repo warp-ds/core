@@ -124,8 +124,8 @@ export async function useRecompute(state: AttentionState) {
       placement: state.directionName,
       middleware: [
         // Should we make this configurable, but have these as sane defaults?
-        flip(),
         offset(8),
+        flip(),
         shift({ padding: 16 }),
         // @ts-ignore
         arrow({ element: state.noArrow ? undefined : state.arrowEl }), // FIXME
@@ -137,9 +137,6 @@ export async function useRecompute(state: AttentionState) {
   Object.assign(state.attentionEl?.style || {}, {
     left: `${position.x}px`,
     top: `${position.y}px`,
-    // transform: `translate3d(${Math.round(position.x)}px, ${Math.round(
-    //   position.y
-    // )}px, 0)`,
   });
   // @ts-ignore
   let { x, y } = position.middlewareData.arrow;
@@ -147,5 +144,6 @@ export async function useRecompute(state: AttentionState) {
   if (state.arrowEl) {
     state.arrowEl.style.left = x ? x + "px" : "";
     state.arrowEl.style.top = y ? y + "px" : "";
-  }
+    }
+    return position
 }
