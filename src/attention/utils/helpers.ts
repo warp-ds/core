@@ -133,17 +133,16 @@ export async function useRecompute(state: AttentionState) {
     }
   );
   // @ts-ignore
- state.actualDirection = position.placement;
+  state.actualDirection = position.placement;
   Object.assign(state.attentionEl?.style || {}, {
     left: `${position.x}px`,
     top: `${position.y}px`,
   });
   // @ts-ignore
   let { x, y } = position.middlewareData.arrow;
-
+  
   if (state.arrowEl) {
     state.arrowEl.style.left = x ? x + "px" : "";
     state.arrowEl.style.top = y ? y + "px" : "";
-    }
-    return position
+  }
 }
