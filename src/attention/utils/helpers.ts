@@ -78,7 +78,7 @@ export type AttentionState = {
   directionName: Directions;
   arrowEl?: HTMLElement | null;
   attentionEl?: HTMLElement | null;
-  targetEl?: unknown;
+  targetEl?: ReferenceElement | null;
   topStart?: Boolean; 
   top?: Boolean;
   topEnd?: Boolean;
@@ -117,6 +117,8 @@ export async function useRecompute(state: AttentionState) {
   if (!state.isShowing) return; // we're not currently showing the element, no reason to recompute
   state?.waitForDOM?.(); // wait for DOM to settle before computing
   if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
+  const arrowOffsetWidth = state.arrowEl ? state.arrowEl.offsetWidth : 0;
+  const floatingOffset = state.arrowEl ? Math.sqrt(2 * arrowOffsetWidth ** 2)/ 2 : 8;
   const cleanup = async () => {
     const position = await computePosition(
       state.targetEl as ReferenceElement,
@@ -124,38 +126,42 @@ export async function useRecompute(state: AttentionState) {
       {
         placement: state.directionName,
         middleware: [
-          // Should we make this configurable, but have these as sane defaults?
-          offset(8),
+          offset(floatingOffset),
           flip(),
           shift({ padding: 16 }),
           state.arrowEl && arrow({ element: state.arrowEl }),
         ],
       }
     );
+    // @ts-ignore
     state.actualDirection = position.placement;
     Object.assign(state.attentionEl?.style || {}, {
       left: `${position.x}px`,
       top: `${position.y}px`,
     });
+
+    const side = position.placement.split("-")[0];
+    
+    const staticSide: string | any = {
+      top: "bottom",
+      right: "left",
+      bottom: "top",
+      left: "right"
+    }[side];
+    console.log("staticSide: ", staticSide);
+    
+
     if (position.middlewareData.arrow) {
-      const { x, y } = position.middlewareData.arrow;
-  
+      // @ts-ignore
+      let { x, y } = position.middlewareData.arrow;  
       Object.assign(state.arrowEl?.style || {}, {
-        // TODO: Fix this, this is a quick fix. Need to understand why it positions it slightly out of the attentionEl for all placements with -start or -end
-        left: x != null
-        ? ((state.actualDirection === "top-start" || state.actualDirection === "bottom-start")
-        ? `${x - 4}px`
-        : (state.actualDirection === "top-end" || state.actualDirection === "bottom-end")
-        ? `${x + 4}px`
-        : `${x}px`)
-        : '',
-        top: y != null
-        ? ((state.actualDirection === "left-start" || state.actualDirection === "right-start")
-        ? `${y - 4}px`
-        : (state.actualDirection === "left-end" || state.actualDirection === "right-end")
-        ? `${y + 4}px`
-        : `${y}px`)
-        : '',
+        left: x !== null ? `${x}px` : "",
+        top: y !== null ? `${y}px` : "",
+        // Ensure the static side gets unset when
+        // flipping to other placements' axes.
+        right: "",
+        bottom: "",
+        [staticSide]: `${-arrowOffsetWidth / 2}px`,
       });
     }
   }
