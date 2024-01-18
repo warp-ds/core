@@ -78,7 +78,7 @@ export type AttentionState = {
   directionName: Directions;
   arrowEl?: HTMLElement | null;
   attentionEl?: HTMLElement | null;
-  targetEl?: ReferenceElement | null;
+  targetEl?: unknown;
   topStart?: Boolean; 
   top?: Boolean;
   topEnd?: Boolean;
@@ -114,57 +114,63 @@ function computeCalloutArrow({
 }
 
 export async function useRecompute(state: AttentionState) {
-  if (!state.isShowing) return; // we're not currently showing the element, no reason to recompute
-  state?.waitForDOM?.(); // wait for DOM to settle before computing
-  if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
-  const arrowOffsetWidth = state.arrowEl ? state.arrowEl.offsetWidth : 0;
-  const floatingOffset = state.arrowEl ? Math.sqrt(2 * arrowOffsetWidth ** 2)/ 2 : 8;
-  const cleanup = async () => {
-    const position = await computePosition(
-      state.targetEl as ReferenceElement,
-      state.attentionEl as HTMLElement,
-      {
-        placement: state.directionName,
-        middleware: [
-          offset(floatingOffset),
-          flip(),
-          shift({ padding: 16 }),
-          state.arrowEl && arrow({ element: state.arrowEl }),
-        ],
+  let isMounted = true;
+  if (state.isShowing === true || state.isCallout) {
+    state?.waitForDOM?.(); // wait for DOM to settle before computing
+    if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
+    const referenceEl = state.targetEl as ReferenceElement
+    const floatingEl = state.attentionEl as HTMLElement
+    const arrowEl = state.arrowEl as HTMLElement
+    const floatingOffset = arrowEl ? Math.sqrt(2 * arrowEl.offsetWidth ** 2)/ 2 : 8;
+  
+    if (isMounted) {
+      const cleanup = async () => {
+        const position = await computePosition(
+          referenceEl,
+          floatingEl,
+          {
+            placement: state.directionName,
+            middleware: [
+              offset(floatingOffset),
+              flip(),
+              shift({ padding: 16 }),
+              arrowEl && arrow({ element: arrowEl }),
+            ],
+          }
+        );
+        // @ts-ignore
+        state.actualDirection = position.placement;
+        Object.assign(state.attentionEl?.style || {}, {
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+        });
+        const side = position.placement.split("-")[0];
+        
+        const staticSide: string | any = {
+          top: "bottom",
+          right: "left",
+          bottom: "top",
+          left: "right"
+        }[side];
+        if (position.middlewareData.arrow) {
+          // @ts-ignore
+          let { x, y } = position.middlewareData.arrow;  
+          Object.assign(arrowEl?.style || {}, {
+            left: x !== null ? `${x}px` : "",
+            top: y !== null ? `${y}px` : "",
+            // // Ensure the static side gets unset when
+            // // flipping to other placements' axes.
+            // right: "",
+            // bottom: "",
+            [staticSide]: `${-arrowEl.offsetWidth / 2}px`,
+          });
+        }
       }
-    );
-    // @ts-ignore
-    state.actualDirection = position.placement;
-    Object.assign(state.attentionEl?.style || {}, {
-      left: `${position.x}px`,
-      top: `${position.y}px`,
-    });
-
-    const side = position.placement.split("-")[0];
-    
-    const staticSide: string | any = {
-      top: "bottom",
-      right: "left",
-      bottom: "top",
-      left: "right"
-    }[side];
-    console.log("staticSide: ", staticSide);
-    
-
-    if (position.middlewareData.arrow) {
-      // @ts-ignore
-      let { x, y } = position.middlewareData.arrow;  
-      Object.assign(state.arrowEl?.style || {}, {
-        left: x !== null ? `${x}px` : "",
-        top: y !== null ? `${y}px` : "",
-        // Ensure the static side gets unset when
-        // flipping to other placements' axes.
-        right: "",
-        bottom: "",
-        [staticSide]: `${-arrowOffsetWidth / 2}px`,
-      });
+      // computePosition() only positions state.attentionEl once. To ensure it remains anchored to the state.targetEl during a variety of scenarios, for example, when resizing or scrolling, we need to wrap the calculation in autoUpdate:
+      autoUpdate(referenceEl, floatingEl, cleanup)
     }
   }
-  // computePosition() only positions state.attentionEl once. To ensure it remains anchored to the state.targetEl during a variety of scenarios, for example, when resizing or scrolling, we need to wrap the calculation in autoUpdate:
-  autoUpdate(state.targetEl as ReferenceElement, state.attentionEl as HTMLElement, cleanup)
+    return () => {
+      isMounted = false;
+    }
 }
