@@ -144,25 +144,16 @@ export async function useRecompute(state: AttentionState) {
           left: `${position.x}px`,
           top: `${position.y}px`,
         });
-        const side = position.placement.split("-")[0];
         
-        const staticSide: string | any = {
-          top: "bottom",
-          right: "left",
-          bottom: "top",
-          left: "right"
-        }[side];
         if (position.middlewareData.arrow) {
           // @ts-ignore
           let { x, y } = position.middlewareData.arrow;  
+
+
           Object.assign(arrowEl?.style || {}, {
-            left: x !== null ? `${x}px` : "",
-            top: y !== null ? `${y}px` : "",
-            // // Ensure the static side gets unset when
-            // // flipping to other placements' axes.
-            // right: "",
-            // bottom: "",
-            [staticSide]: `${-arrowEl.offsetWidth / 2}px`,
+            left: x ? `${x}px` : "",
+            // temporary fix, for some reasing left-start and right-start positions the arrowEL slightly too far from the attentionEl
+            top: y ? `${y - 4}px` : "",
           });
         }
       }
