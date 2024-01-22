@@ -121,7 +121,6 @@ export async function useRecompute(state: AttentionState) {
     const referenceEl = state.targetEl as ReferenceElement
     const floatingEl = state.attentionEl as HTMLElement
     const arrowEl = state.arrowEl as HTMLElement
-    const floatingOffset = arrowEl ? Math.sqrt(2 * arrowEl.offsetWidth ** 2)/ 2 : 8;
   
     if (isMounted) {
       const update = async () => {
@@ -131,7 +130,7 @@ export async function useRecompute(state: AttentionState) {
           {
             placement: state.directionName,
             middleware: [
-              offset(floatingOffset),
+              offset(8),
               flip(),
               shift({ padding: 16 }),
               arrowEl && arrow({ element: arrowEl }),
