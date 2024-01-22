@@ -146,7 +146,7 @@ export async function useRecompute(state: AttentionState) {
 
         if (position.middlewareData.arrow) {
           // @ts-ignore
-          let { x, y } = position.middlewareData.arrow;  
+          const { x, y } = position.middlewareData.arrow;  
 
 
           Object.assign(arrowEl?.style || {}, {
