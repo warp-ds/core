@@ -124,7 +124,7 @@ export async function useRecompute(state: AttentionState) {
     const floatingOffset = arrowEl ? Math.sqrt(2 * arrowEl.offsetWidth ** 2)/ 2 : 8;
   
     if (isMounted) {
-      const cleanup = async () => {
+      const update = async () => {
         const position = await computePosition(
           referenceEl,
           floatingEl,
@@ -158,7 +158,7 @@ export async function useRecompute(state: AttentionState) {
         }
       }
       // computePosition() only positions state.attentionEl once. To ensure it remains anchored to the state.targetEl during a variety of scenarios, for example, when resizing or scrolling, we need to wrap the calculation in autoUpdate:
-      autoUpdate(referenceEl, floatingEl, cleanup)
+      autoUpdate(referenceEl, floatingEl, update)
     }
   }
     return () => {
