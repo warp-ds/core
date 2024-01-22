@@ -153,7 +153,7 @@ export async function useRecompute(state: AttentionState) {
           Object.assign(arrowEl?.style || {}, {
             left: x ? `${x}px` : "",
             // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far from the attentionEl
-            top: y ? `${y - 4}px` : "",
+            top: y ? position.placement.includes("-start" || "-end") ? `${y - 4}px` : `${y}px` : "",
           });
         }
       }
