@@ -113,78 +113,136 @@ function computeCalloutArrow({
   arrowEl.style.top = !directionIsVertical ? middlePosition : "";
 }
 
-export function updatePosition(state: AttentionState) {
-  if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
-    state?.waitForDOM?.(); // wait for DOM to settle before computing
-    if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
-    const referenceEl = state.targetEl as ReferenceElement
-    const floatingEl = state.attentionEl as HTMLElement
-    const arrowEl = state.arrowEl as HTMLElement
-
-    autoUpdate(referenceEl, floatingEl, () => {
-      computePosition(referenceEl, floatingEl, {
-          placement: state.directionName,
-          middleware: [
-            offset(8),
-            flip(),
-            shift({ padding: 16 }),
-            arrowEl && arrow({ element: arrowEl })]
-        }).then(({ x, y, middlewareData, placement}) => {
-          state.actualDirection = placement;
-          console.log("actualDirection: ", state.actualDirection);
-          Object.assign(state.attentionEl?.style || {}, {
-            left: `${x}px`,
-            top: `${y}px`,
-          });
+// export function updatePosition(state: AttentionState, isMounted: any) {
+//   console.log("Do we get to the start of the updatePosition?, isMounted: ", isMounted);
   
-          if (middlewareData.arrow) {
-            const { x, y } = middlewareData.arrow;  
-            Object.assign(arrowEl?.style || {}, {
-              left: x ? `${x}px` : "",
-              // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far down on the attentionEl
-              top: y ? placement.includes("-start") ? `${y - 4}px` : `${y}px` : "",
-            });
-          }
-        });
-    })
-}
-
-// export function updatePosition(state: AttentionState) {
 //   if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
+//   if (isMounted === true) {
 //     state?.waitForDOM?.(); // wait for DOM to settle before computing
 //     if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
 //     const referenceEl = state.targetEl as ReferenceElement
 //     const floatingEl = state.attentionEl as HTMLElement
 //     const arrowEl = state.arrowEl as HTMLElement
 
-//     computePosition(referenceEl, floatingEl, {
-//         placement: state.directionName,
-//         middleware: [
-//           offset(8),
-//           flip(),
-//           shift({ padding: 16 }),
-//           arrowEl && arrow({ element: arrowEl })]
-//       }).then(({ x, y, middlewareData, placement}) => {
-//         state.actualDirection = placement;
-//         console.log("actualDirection: ", state.actualDirection);
-//         Object.assign(state.attentionEl?.style || {}, {
-//           left: `${x}px`,
-//           top: `${y}px`,
-//         });
-
-//         if (middlewareData.arrow) {
-//           const { x, y } = middlewareData.arrow;  
-//           Object.assign(arrowEl?.style || {}, {
-//             left: x ? `${x}px` : "",
-//             // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far down on the attentionEl
-//             top: y ? placement.includes("-start") ? `${y - 4}px` : `${y}px` : "",
+//       autoUpdate(referenceEl, floatingEl, () => {
+//         computePosition(referenceEl, floatingEl, {
+//             placement: state.directionName,
+//             middleware: [
+//               offset(8),
+//               flip(),
+//               shift({ padding: 16 }),
+//               arrowEl && arrow({ element: arrowEl })]
+//           }).then(({ x, y, middlewareData, placement}) => {
+//             if (isMounted === true) {
+//               if (state.isShowing === true) {
+//                 console.log("Do we get here regardless?");
+//                 console.log("true? ", state.isShowing === true);
+                
+//                 state.actualDirection = placement;
+//                 console.log("actualDirection: ", state.actualDirection);
+//                 Object.assign(state.attentionEl?.style || {}, {
+//                   left: `${x}px`,
+//                   top: `${y}px`,
+//                 });
+        
+//                 if (middlewareData.arrow) {
+//                   const { x, y } = middlewareData.arrow;  
+//                   Object.assign(arrowEl?.style || {}, {
+//                     left: x ? `${x}px` : "",
+//                     // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far down on the attentionEl
+//                     top: y ? placement.includes("-start") ? `${y - 4}px` : `${y}px` : "",
+//                   });
+//                 }
+//               }
+//             }
 //           });
-//         }
-//       });
+//       })
+//   }
 // }
 
-// export function cleanUp(state: AttentionState) {
-//   const referenceEl = state.targetEl as ReferenceElement
-//   const floatingEl = state.attentionEl as HTMLElement
-//   autoUpdate(referenceEl, floatingEl, () => updatePosition(state))
-// }
+export function useRecompute(state: AttentionState, isMounted: any) {
+  console.log("state.isShowing: ", state.isShowing);
+  if (isMounted === true) {
+    console.log("isMounted true in useRecompute? ", isMounted);
+    
+    if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
+      state?.waitForDOM?.(); // wait for DOM to settle before computing
+      if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
+      const referenceEl = state.targetEl as ReferenceElement
+      const floatingEl = state.attentionEl as HTMLElement
+      const arrowEl = state.arrowEl as HTMLElement
+
+
+      async function update () {
+        console.log("are we being called by cleanup?");
+        
+        const position = await computePosition(referenceEl, floatingEl, {
+          placement: state.directionName,
+          middleware: [
+            offset(8),
+            flip(),
+            shift({ padding: 16 }),
+            arrowEl && arrow({ element: arrowEl })
+          ]
+        }) 
+        // @ts-ignore
+        
+        state.actualDirection = position.placement;
+        console.log("state.actualDirection: ", state.actualDirection);
+        Object.assign(state.attentionEl?.style || {}, {
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+        });
+    
+        if (position.middlewareData.arrow) {
+          // @ts-ignore
+          const { x, y } = position.middlewareData.arrow;
+          if (state.arrowEl) {
+            Object.assign(arrowEl?.style || {}, {
+              left: x ? `${x}px` : "",
+              // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far down on the attentionEl
+              top: y ? position.placement.includes("-start") ? `${y - 4}px` : `${y}px` : "",
+            });
+          }
+        }
+      }
+      // @ts-ignore
+      const cleanup = autoUpdate(referenceEl, floatingEl, update);
+      if (isMounted === false && !state.isShowing) {
+        console.log("kommer vi hit?, isMounted: ", isMounted);
+       cleanup()
+      } else {
+        console.log("kommer vi till elsen av useRecompute? ");
+        return
+      }
+
+  }
+  
+
+    // computePosition(referenceEl, floatingEl, {
+    //     placement: state.directionName,
+    //     middleware: [
+    //       offset(8),
+    //       flip(),
+    //       shift({ padding: 16 }),
+    //       arrowEl && arrow({ element: arrowEl })]
+    //   }).then(({ x, y, middlewareData, placement}) => {
+    //     if (state.isShowing) {
+    //       state.actualDirection = placement;
+    //       console.log("actualDirection: ", state.actualDirection);
+    //       Object.assign(state.attentionEl?.style || {}, {
+    //         left: `${x}px`,
+    //         top: `${y}px`,
+    //       });
+  
+    //       if (middlewareData.arrow) {
+    //         const { x, y } = middlewareData.arrow;  
+    //         Object.assign(arrowEl?.style || {}, {
+    //           left: x ? `${x}px` : "",
+    //           // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far down on the attentionEl
+    //           top: y ? placement.includes("-start") ? `${y - 4}px` : `${y}px` : "",
+    //         });
+    //       }
+    //     }
+    //   });
+}
