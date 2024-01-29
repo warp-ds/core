@@ -98,7 +98,5 @@ export async function useRecompute (state: AttentionState, update: () => void) {
     if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
       state?.waitForDOM?.(); // wait for DOM to settle before computing
       if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
-      if (!state.attentionEl) return
-
       update()
 }
