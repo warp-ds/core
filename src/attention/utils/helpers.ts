@@ -75,7 +75,6 @@ export type AttentionState = {
   actualDirection?: Directions;
   directionName: Directions;
   arrowEl?: HTMLElement | null;
-  attentionEl?: HTMLElement | null;
   waitForDOM?: () => void;
 };
 
