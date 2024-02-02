@@ -31,9 +31,6 @@
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
-  "dependencies": {
-    "@floating-ui/dom": "^1.5.4"
-  },
   "devDependencies": {
     "typescript": "^4.7.4",
     "@semantic-release/changelog": "^6.0.3",
