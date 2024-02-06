@@ -1,3 +1,13 @@
+import {
+  computePosition,
+  flip,
+  offset,
+  shift,
+  arrow,
+  autoUpdate,
+  ReferenceElement
+} from '@floating-ui/dom'
+
 const TOPSTART = "top-start";
 const TOP = "top";
 const TOPEND = "top-end";
@@ -23,6 +33,8 @@ type Directions =   | 'top'
 | 'left'
 | 'left-start'
 | 'left-end';
+
+type FallbackDirection = | 'none' | 'start' | 'end';
 
 export const opposites = {
   [TOPSTART]: BOTTOMSTART,
@@ -75,17 +87,24 @@ export type AttentionState = {
   actualDirection?: Directions;
   directionName: Directions;
   arrowEl?: HTMLElement | null;
+  attentionEl?: HTMLElement | null;
+  fallbackDirection?: FallbackDirection
+  targetEl?: unknown;
+  tooltip?: Boolean;
+  popover?: Boolean;
+  callout?: Boolean;
+  noArrow?: Boolean;
   waitForDOM?: () => void;
 };
 
 const middlePosition = "calc(50% - 7px)";
 const isDirectionVertical = (name: string) => [TOPSTART, TOP, TOPEND, BOTTOMSTART, BOTTOM, BOTTOMEND].includes(name);
-function computeCalloutArrow({
-  actualDirection,
-  directionName,
-  arrowEl,
-}: AttentionState) {
+export function computeCalloutArrow(actualDirection: string, directionName: string, arrowElement: unknown) {
+const arrowEl: HTMLElement = arrowElement as HTMLElement
   if (!arrowEl) return;
+console.log("inside the computeCalloutArrow?");
+console.log("actualDirection: ", actualDirection);
+
 
   actualDirection = directionName;
   const directionIsVertical = isDirectionVertical(directionName);
@@ -93,11 +112,49 @@ function computeCalloutArrow({
   arrowEl.style.top = !directionIsVertical ? middlePosition : "";
 }
 
-export async function useRecompute (state: AttentionState, update: () => void) {
+async function useRecompute (state: AttentionState) {
+  console.log("in the useRecompute, state: ", state)
     if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
     if (state?.waitForDOM) {
       await state.waitForDOM(); // wait for DOM to settle before computing
     }  
-      if (state.isCallout) return computeCalloutArrow(state); // we don't move the callout box
-      update()
+      const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
+      const floatingEl: HTMLElement = state.attentionEl as unknown as HTMLElement
+      
+      if (!floatingEl) return
+      computePosition(referenceEl, floatingEl, {
+        placement: state.directionName,
+        middleware: [
+          offset(8),
+          flip({ fallbackAxisSideDirection: state.fallbackDirection, fallbackStrategy: 'initialPlacement'}),
+          shift({ padding: 16 }),
+          !state.noArrow && state.arrowEl && arrow({ element: state.arrowEl as unknown as HTMLElement })]
+      }).then(({ x, y, middlewareData, placement}) => {
+        state.actualDirection = placement
+        console.log("state.actualDirection: ", state.actualDirection);
+        
+        Object.assign(floatingEl.style, {
+          left: `${x}px`,
+          top: `${y}px`,
+        })
+    
+        if (middlewareData.arrow) {
+          const { x, y } = middlewareData.arrow
+          Object.assign(state.arrowEl?.style || {}, {
+            // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far from the attentionEl
+            left: x ? placement.includes("-start") ? `${x - 12}px` : `${x}px` : '',
+            top: y ? placement.includes("-start") ? `${y - 12}px` : `${y}px` : '',
+          });
+        }
+      });    
+}
+
+export const autoUpdatePosition = (state: AttentionState) => {
+  const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
+  const floatingEl: HTMLElement = state.attentionEl as HTMLElement
+  console.log("kommer vi till autoUpdatePosition")
+  console.log("state: ", state);
+  
+  
+  return autoUpdate(referenceEl, floatingEl, () => { useRecompute(state) })
 }
