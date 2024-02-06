@@ -112,14 +112,16 @@ console.log("actualDirection: ", actualDirection);
   arrowEl.style.top = !directionIsVertical ? middlePosition : "";
 }
 
-async function useRecompute (state: AttentionState) {
-  console.log("in the useRecompute, state: ", state)
-    if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
-    if (state?.waitForDOM) {
-      await state.waitForDOM(); // wait for DOM to settle before computing
-    }  
-      const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
-      const floatingEl: HTMLElement = state.attentionEl as unknown as HTMLElement
+async function useRecompute (state: AttentionState) {  
+  if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
+  if (state?.waitForDOM) {
+    await state.waitForDOM(); // wait for DOM to settle before computing
+  }  
+  const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
+  const floatingEl: HTMLElement = state.attentionEl as unknown as HTMLElement
+  const arrowEl: HTMLElement = state.arrowEl as unknown as HTMLElement
+  if (!state.noArrow) {
+  }
       
       if (!floatingEl) return
       computePosition(referenceEl, floatingEl, {
@@ -128,7 +130,7 @@ async function useRecompute (state: AttentionState) {
           offset(8),
           flip({ fallbackAxisSideDirection: state.fallbackDirection, fallbackStrategy: 'initialPlacement'}),
           shift({ padding: 16 }),
-          !state.noArrow && state.arrowEl && arrow({ element: state.arrowEl as unknown as HTMLElement })]
+          !state.noArrow && arrowEl && arrow({ element: arrowEl })]
       }).then(({ x, y, middlewareData, placement}) => {
         state.actualDirection = placement
         console.log("state.actualDirection: ", state.actualDirection);
@@ -140,20 +142,18 @@ async function useRecompute (state: AttentionState) {
     
         if (middlewareData.arrow) {
           const { x, y } = middlewareData.arrow
-          Object.assign(state.arrowEl?.style || {}, {
+          Object.assign(arrowEl?.style || {}, {
             // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far from the attentionEl
             left: x ? placement.includes("-start") ? `${x - 12}px` : `${x}px` : '',
             top: y ? placement.includes("-start") ? `${y - 12}px` : `${y}px` : '',
           });
         }
-      });    
+      });
 }
 
 export const autoUpdatePosition = (state: AttentionState) => {
   const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state.attentionEl as HTMLElement
-  console.log("kommer vi till autoUpdatePosition")
-  console.log("state: ", state);
   
   
   return autoUpdate(referenceEl, floatingEl, () => { useRecompute(state) })
