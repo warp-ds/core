@@ -50,6 +50,7 @@ export const opposites = {
   [RIGHT]: LEFT,
   [RIGHTEND]: LEFTEND,
 };
+
 export const arrowLabels = {
   [TOPSTART]: "↑",
   [TOP]: "↑",
@@ -112,7 +113,7 @@ console.log("actualDirection: ", actualDirection);
   arrowEl.style.top = !directionIsVertical ? middlePosition : "";
 }
 
-async function useRecompute (state: AttentionState) {  
+async function useRecompute (state: AttentionState) {
   if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
     await state.waitForDOM(); // wait for DOM to settle before computing
@@ -139,13 +140,12 @@ async function useRecompute (state: AttentionState) {
           left: `${x}px`,
           top: `${y}px`,
         })
-    
+
         if (middlewareData.arrow) {
           const { x, y } = middlewareData.arrow
           Object.assign(arrowEl?.style || {}, {
-            // TODO: temporary fix, for some reason left-start and right-start positions the arrowEL slightly too far from the attentionEl
-            left: x ? placement.includes("-start") ? `${x - 12}px` : `${x}px` : '',
-            top: y ? placement.includes("-start") ? `${y - 12}px` : `${y}px` : '',
+            left: x ? `${x}px` : '',
+            top: y ? `${y}px` : '',
           });
         }
       });
