@@ -37,18 +37,18 @@ type Directions =   | 'top'
 type FallbackDirection = | 'none' | 'start' | 'end';
 
 export const opposites = {
-  [TOPSTART]: BOTTOMSTART,
+  [TOPSTART]: BOTTOMEND,
   [TOP]: BOTTOM,
-  [TOPEND]: BOTTOMEND,
-  [BOTTOMSTART]: TOPSTART,
+  [TOPEND]: BOTTOMSTART,
+  [BOTTOMSTART]: TOPEND,
   [BOTTOM]: TOP,
-  [BOTTOMEND]: TOPEND,
-  [LEFTSTART]: RIGHTSTART,
+  [BOTTOMEND]: TOPSTART,
+  [LEFTSTART]: RIGHTEND,
   [LEFT]: RIGHT,
-  [LEFTEND]: RIGHTEND,
-  [RIGHTSTART]: LEFTSTART,
+  [LEFTEND]: RIGHTSTART,
+  [RIGHTSTART]: LEFTEND,
   [RIGHT]: LEFT,
-  [RIGHTEND]: LEFTEND,
+  [RIGHTEND]: LEFTSTART,
 };
 
 export const arrowLabels = {
@@ -113,7 +113,7 @@ console.log("actualDirection: ", actualDirection);
   arrowEl.style.top = !directionIsVertical ? middlePosition : "";
 }
 
-async function useRecompute (state: AttentionState) {
+export async function useRecompute (state: AttentionState) {  
   if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
     await state.waitForDOM(); // wait for DOM to settle before computing
@@ -141,11 +141,26 @@ async function useRecompute (state: AttentionState) {
           top: `${y}px`,
         })
 
+        // const side = placement.split("-")[0];
+
+        // const staticSide = {
+        //   top: "bottom",
+        //   right: "left",
+        //   bottom: "top",
+        //   left: "right"
+        // }[side];
+
         if (middlewareData.arrow) {
           const { x, y } = middlewareData.arrow
+          
           Object.assign(arrowEl?.style || {}, {
             left: x ? `${x}px` : '',
             top: y ? `${y}px` : '',
+            // right: "",
+            // bottom: "",
+            // // @ts-ignore
+            // [staticSide]: `${-arrowEl.offsetWidth / 2}px`,
+            // transform: "rotate(45deg)",
           });
         }
       });
@@ -154,7 +169,7 @@ async function useRecompute (state: AttentionState) {
 export const autoUpdatePosition = (state: AttentionState) => {
   const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state.attentionEl as HTMLElement
-  
+  console.log("autoUpdatePosition called, ", floatingEl);
   
   return autoUpdate(referenceEl, floatingEl, () => { useRecompute(state) })
 }
