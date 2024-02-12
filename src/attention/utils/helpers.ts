@@ -164,12 +164,12 @@ export async function useRecompute (state: AttentionState) {
           });
         }
       });
+
+      return state
 }
 
 export const autoUpdatePosition = (state: AttentionState) => {
   const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state.attentionEl as HTMLElement
-  console.log("autoUpdatePosition called, ", floatingEl);
-  
   return autoUpdate(referenceEl, floatingEl, () => { useRecompute(state) })
 }
