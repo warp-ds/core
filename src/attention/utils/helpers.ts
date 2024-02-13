@@ -100,12 +100,13 @@ export type AttentionState = {
 
 const middlePosition = "calc(50% - 7px)";
 const isDirectionVertical = (name: string) => [TOPSTART, TOP, TOPEND, BOTTOMSTART, BOTTOM, BOTTOMEND].includes(name);
-export function computeCalloutArrow(actualDirection: string, directionName: string, arrowElement: unknown) {
-const arrowEl: HTMLElement = arrowElement as HTMLElement
-  if (!arrowEl) return;
-console.log("inside the computeCalloutArrow?");
-console.log("actualDirection: ", actualDirection);
 
+function computeCalloutArrow({
+  actualDirection,
+  directionName,
+  arrowEl,
+}: AttentionState) {
+  if (!arrowEl) return;
 
   actualDirection = directionName;
   const directionIsVertical = isDirectionVertical(directionName);
@@ -117,10 +118,12 @@ export async function useRecompute (state: AttentionState) {
   if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
     await state.waitForDOM(); // wait for DOM to settle before computing
-  }  
+  }
+  if (state.isCallout) return computeCalloutArrow(state)
   const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state.attentionEl as unknown as HTMLElement
   const arrowEl: HTMLElement = state.arrowEl as unknown as HTMLElement
+
   if (!state.noArrow) {
   }
       
@@ -140,7 +143,7 @@ export async function useRecompute (state: AttentionState) {
           left: `${x}px`,
           top: `${y}px`,
         })
-
+        
         // const side = placement.split("-")[0];
 
         // const staticSide = {
