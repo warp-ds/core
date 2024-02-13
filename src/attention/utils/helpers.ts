@@ -144,26 +144,47 @@ export async function useRecompute (state: AttentionState) {
           top: `${y}px`,
         })
         
-        // const side = placement.split("-")[0];
+        const side = placement.split("-")[0];
+        
+        const staticSide: any = {
+          top: "bottom",
+          right: "left",
+          bottom: "top",
+          left: "right"
+        }[side];
 
-        // const staticSide = {
-        //   top: "bottom",
-        //   right: "left",
-        //   bottom: "top",
-        //   left: "right"
-        // }[side];
-
+        const isRtl = window.getComputedStyle(floatingEl).direction === 'rtl'
+        const arrowDirection: any = opposites[placement]
+        const arrowPlacement: any = arrowDirection.split("-")[1]
+        
         if (middlewareData.arrow) {
           const { x, y } = middlewareData.arrow
-          
+          let top = ''
+          let right = ''
+          let bottom = ''
+          let left = ''
+
+          if (arrowPlacement === "start") {
+            const value = typeof x === 'number' ? `calc(10px - ${arrowEl.offsetWidth / 2}px)` : '';
+            top = typeof y === 'number' ? `calc(10px -  ${arrowEl.offsetWidth / 2}px)` : '';
+            right = isRtl ? value : '';
+            left = isRtl ? '' : value;
+          } else if (arrowPlacement === "end") {
+            const value = typeof x === 'number' ? `calc(10px - ${arrowEl.offsetWidth / 2}px)` : '';
+            right = isRtl ? '' : value;
+            left = isRtl ? value : '';
+            bottom = typeof y === 'number' ? `calc(10px - ${arrowEl.offsetWidth / 2}px)` : '';
+          } else {
+            left = typeof x === 'number' ? `${x}px` : '';
+            top = typeof y === 'number' ? `${y}px` : '';
+          }
+
           Object.assign(arrowEl?.style || {}, {
-            left: x ? `${x}px` : '',
-            top: y ? `${y}px` : '',
-            // right: "",
-            // bottom: "",
-            // // @ts-ignore
-            // [staticSide]: `${-arrowEl.offsetWidth / 2}px`,
-            // transform: "rotate(45deg)",
+            top,
+            right,
+            bottom,
+            left,
+            [staticSide]: `${-arrowEl.offsetWidth / 2}px`
           });
         }
       });
