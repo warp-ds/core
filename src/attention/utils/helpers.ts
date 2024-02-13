@@ -67,7 +67,7 @@ export const arrowLabels = {
 
 };
 export const directions = [TOPSTART, TOP, TOPEND, BOTTOMSTART, BOTTOM, BOTTOMEND, LEFTSTART, LEFT, LEFTEND, RIGHTSTART, RIGHT, RIGHTEND];
-export const rotation = {
+export const rotation: any = {
   [LEFTSTART]: -45,
   [LEFT]: -45,
   [LEFTEND]: -45,
@@ -109,9 +109,19 @@ function computeCalloutArrow({
   if (!arrowEl) return;
 
   actualDirection = directionName;
+
+  const arrowDirection = opposites[actualDirection]
+  const arrowRotation = rotation[arrowDirection]
+
+  console.log("arrowDirection callout: ", arrowDirection);
+  console.log("arrowRotation callout: ", arrowRotation);
+  
+  
+
   const directionIsVertical = isDirectionVertical(directionName);
   arrowEl.style.left = directionIsVertical ? middlePosition : "";
   arrowEl.style.top = !directionIsVertical ? middlePosition : "";
+  arrowEl.style.transform = `rotate(${arrowRotation}deg)`;
 }
 
 export async function useRecompute (state: AttentionState) {  
@@ -119,10 +129,15 @@ export async function useRecompute (state: AttentionState) {
   if (state?.waitForDOM) {
     await state.waitForDOM(); // wait for DOM to settle before computing
   }
-  if (state.isCallout) return computeCalloutArrow(state)
+  if (state.isCallout) {
+    console.log("kommer vi till callout?");
+    return computeCalloutArrow(state)
+  }
   const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state.attentionEl as unknown as HTMLElement
   const arrowEl: HTMLElement = state.arrowEl as unknown as HTMLElement
+  console.log("arrowEl: ", arrowEl);
+  
 
   if (!state.noArrow) {
   }
@@ -143,6 +158,7 @@ export async function useRecompute (state: AttentionState) {
           left: `${x}px`,
           top: `${y}px`,
         })
+        console.log("placement: ", placement);
         
         const side = placement.split("-")[0];
         
@@ -153,9 +169,13 @@ export async function useRecompute (state: AttentionState) {
           left: "right"
         }[side];
 
+        console.log("side: ", staticSide);
+        
+
         const isRtl = window.getComputedStyle(floatingEl).direction === 'rtl'
         const arrowDirection: any = opposites[placement]
         const arrowPlacement: any = arrowDirection.split("-")[1]
+        const arrowRotation: any = rotation[arrowDirection]
         
         if (middlewareData.arrow) {
           const { x, y } = middlewareData.arrow
@@ -184,7 +204,8 @@ export async function useRecompute (state: AttentionState) {
             right,
             bottom,
             left,
-            [staticSide]: `${-arrowEl.offsetWidth / 2}px`
+            [staticSide]: `${-arrowEl.offsetWidth / 2}px`,
+            transform: `rotate(${arrowRotation}deg)`
           });
         }
       });
