@@ -132,7 +132,7 @@ export async function useRecompute (state: AttentionState) {
         placement: state.directionName,
         middleware: [
           offset(8),
-          flip({ fallbackAxisSideDirection: state.fallbackDirection, fallbackStrategy: 'initialPlacement'}),
+          flip({ fallbackAxisSideDirection: "start", fallbackStrategy: 'initialPlacement'}),
           shift({ padding: 16 }),
           !state.noArrow && arrowEl && arrow({ element: arrowEl })]
       }).then(({ x, y, middlewareData, placement}) => {
