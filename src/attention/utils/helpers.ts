@@ -94,6 +94,7 @@ export type AttentionState = {
   tooltip?: Boolean;
   popover?: Boolean;
   callout?: Boolean;
+  highlight?: Boolean;
   noArrow?: Boolean;
   waitForDOM?: () => void;
 };
@@ -113,11 +114,6 @@ function computeCalloutArrow({
   const arrowDirection = opposites[actualDirection]
   const arrowRotation = rotation[arrowDirection]
 
-  console.log("arrowDirection callout: ", arrowDirection);
-  console.log("arrowRotation callout: ", arrowRotation);
-  
-  
-
   const directionIsVertical = isDirectionVertical(directionName);
   arrowEl.style.left = directionIsVertical ? middlePosition : "";
   arrowEl.style.top = !directionIsVertical ? middlePosition : "";
@@ -125,96 +121,89 @@ function computeCalloutArrow({
 }
 
 export async function useRecompute (state: AttentionState) {  
-  if (!state.isShowing)  return // we're not currently showing the element, no reason to recompute
+  if (!state?.isShowing)  return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
-    await state.waitForDOM(); // wait for DOM to settle before computing
+    await state?.waitForDOM(); // wait for DOM to settle before computing
   }
-  if (state.isCallout) {
-    console.log("kommer vi till callout?");
+  if (state?.isCallout) {
     return computeCalloutArrow(state)
   }
-  const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
-  const floatingEl: HTMLElement = state.attentionEl as unknown as HTMLElement
-  const arrowEl: HTMLElement = state.arrowEl as unknown as HTMLElement
-  console.log("arrowEl: ", arrowEl);
-  
 
-  if (!state.noArrow) {
-  }
+  const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
+  const floatingEl: HTMLElement = state?.attentionEl as unknown as HTMLElement
+  const arrowEl: HTMLElement = state?.arrowEl as unknown as HTMLElement
       
-      if (!floatingEl) return
-      computePosition(referenceEl, floatingEl, {
-        placement: state.directionName,
-        middleware: [
-          offset(8),
-          flip({ fallbackAxisSideDirection: "start", fallbackStrategy: 'initialPlacement'}),
-          shift({ padding: 16 }),
-          !state.noArrow && arrowEl && arrow({ element: arrowEl })]
-      }).then(({ x, y, middlewareData, placement}) => {
-        state.actualDirection = placement
-        console.log("state.actualDirection: ", state.actualDirection);
-        
-        Object.assign(floatingEl.style, {
-          left: `${x}px`,
-          top: `${y}px`,
-        })
-        console.log("placement: ", placement);
-        
-        const side = placement.split("-")[0];
-        
-        const staticSide: any = {
-          top: "bottom",
-          right: "left",
-          bottom: "top",
-          left: "right"
-        }[side];
+      if (!referenceEl || !floatingEl) return
 
-        console.log("side: ", staticSide);
-        
-
-        const isRtl = window.getComputedStyle(floatingEl).direction === 'rtl'
-        const arrowDirection: any = opposites[placement]
-        const arrowPlacement: any = arrowDirection.split("-")[1]
-        const arrowRotation: any = rotation[arrowDirection]
-        
-        if (middlewareData.arrow) {
-          const { x, y } = middlewareData.arrow
-          let top = ''
-          let right = ''
-          let bottom = ''
-          let left = ''
-
-          if (arrowPlacement === "start") {
-            const value = typeof x === 'number' ? `calc(10px - ${arrowEl.offsetWidth / 2}px)` : '';
-            top = typeof y === 'number' ? `calc(10px -  ${arrowEl.offsetWidth / 2}px)` : '';
-            right = isRtl ? value : '';
-            left = isRtl ? '' : value;
-          } else if (arrowPlacement === "end") {
-            const value = typeof x === 'number' ? `calc(10px - ${arrowEl.offsetWidth / 2}px)` : '';
-            right = isRtl ? '' : value;
-            left = isRtl ? value : '';
-            bottom = typeof y === 'number' ? `calc(10px - ${arrowEl.offsetWidth / 2}px)` : '';
-          } else {
-            left = typeof x === 'number' ? `${x}px` : '';
-            top = typeof y === 'number' ? `${y}px` : '';
+        computePosition(referenceEl, floatingEl, {
+          placement: state?.directionName,
+          middleware: [
+            offset(8),
+            flip({ fallbackAxisSideDirection: "start", fallbackStrategy: 'initialPlacement'}),
+            shift({ padding: 16 }),
+            !state?.noArrow && arrowEl && arrow({ element: arrowEl })]
+        }).then(({ x, y, middlewareData, placement}) => {
+          state.actualDirection = placement
+          console.log("state?.actualDirection: ", state?.actualDirection);
+          
+          Object.assign(floatingEl.style, {
+            left: `${x}px`,
+            top: `${y}px`,
+          })
+          
+          const side = placement.split("-")[0];
+          
+          const staticSide: any = {
+            top: "bottom",
+            right: "left",
+            bottom: "top",
+            left: "right"
+          }[side];
+  
+  
+          const isRtl = window.getComputedStyle(floatingEl).direction === 'rtl'
+          const arrowDirection: any = opposites[placement]
+          const arrowPlacement: any = arrowDirection.split("-")[1]
+          const arrowRotation: any = rotation[arrowDirection]
+          
+          if (middlewareData.arrow) {
+            const { x, y } = middlewareData.arrow
+            let top = ''
+            let right = ''
+            let bottom = ''
+            let left = ''
+  
+            if (arrowPlacement === "start") {
+              const value = typeof x === 'number' ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)` : '';
+              top = typeof y === 'number' ? `calc(10px -  ${arrowEl?.offsetWidth / 2}px)` : '';
+              right = isRtl ? value : '';
+              left = isRtl ? '' : value;
+            } else if (arrowPlacement === "end") {
+              const value = typeof x === 'number' ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)` : '';
+              right = isRtl ? '' : value;
+              left = isRtl ? value : '';
+              bottom = typeof y === 'number' ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)` : '';
+            } else {
+              left = typeof x === 'number' ? `${x}px` : '';
+              top = typeof y === 'number' ? `${y}px` : '';
+            }
+  
+            Object.assign(arrowEl?.style || {}, {
+              top,
+              right,
+              bottom,
+              left,
+              [staticSide]: `${-arrowEl?.offsetWidth / 2}px`,
+              transform: `rotate(${arrowRotation}deg)`
+            });
           }
-
-          Object.assign(arrowEl?.style || {}, {
-            top,
-            right,
-            bottom,
-            left,
-            [staticSide]: `${-arrowEl.offsetWidth / 2}px`,
-            transform: `rotate(${arrowRotation}deg)`
-          });
-        }
-      });
+        });
 
       return state
 }
 
 export const autoUpdatePosition = (state: AttentionState) => {
-  const referenceEl: ReferenceElement = state.targetEl as ReferenceElement
-  const floatingEl: HTMLElement = state.attentionEl as HTMLElement
+  const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
+  const floatingEl: HTMLElement = state?.attentionEl as HTMLElement
   return autoUpdate(referenceEl, floatingEl, () => { useRecompute(state) })
 }
