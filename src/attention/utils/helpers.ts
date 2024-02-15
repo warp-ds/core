@@ -96,6 +96,8 @@ export type AttentionState = {
   callout?: Boolean;
   highlight?: Boolean;
   noArrow?: Boolean;
+  distance?: number;
+  skidding?: number;
   waitForDOM?: () => void;
 };
 
@@ -138,7 +140,7 @@ export async function useRecompute (state: AttentionState) {
         computePosition(referenceEl, floatingEl, {
           placement: state?.directionName,
           middleware: [
-            offset(8),
+            offset({ mainAxis: state?.distance, crossAxis: state?.skidding }),
             flip({ fallbackAxisSideDirection: "start", fallbackStrategy: 'initialPlacement'}),
             shift({ padding: 16 }),
             !state?.noArrow && arrowEl && arrow({ element: arrowEl })]
