@@ -136,9 +136,9 @@ function computeCalloutArrow({
   arrowEl.style.transform = `rotate(${arrowRotation}deg)`
 }
 
-// export function observer(isShowing)
-
 export async function useRecompute(state: AttentionState) {
+  console.log("state.isShowing: ", state.isShowing);
+  
   if (!state?.isShowing) return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
     await state?.waitForDOM() // wait for DOM to settle before computing
@@ -150,38 +150,38 @@ export async function useRecompute(state: AttentionState) {
   const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state?.attentionEl as unknown as HTMLElement
   const arrowEl: HTMLElement = state?.arrowEl as unknown as HTMLElement
-
+  
   if (!referenceEl || !floatingEl) return
-
-  // We stop computing the position of the floatingEl when referenceEl is no longer in view:
-  const observer: IntersectionObserver = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (state?.isShowing && !entry.isIntersecting) {
-        state.isShowing = false
-        console.log("state.isShowing: ", state.isShowing);
-      }
-    }
-  })
-
-  const observedElements = new Set<Element>()
-
-  if (referenceEl && !observedElements.has(referenceEl as Element)) {
-    observer.observe(referenceEl as Element)
-    observedElements.add(referenceEl as Element)
-  }
-  if (!state.isShowing) {
-    observer.unobserve(referenceEl as Element)
-    console.log("kommer vi hit?");
-    
-    observedElements.delete(referenceEl as Element)
-    return
-  }
+  // We stop computing the position of the floatingEl when referenceEl is no longer visible:
+  // const observer: IntersectionObserver = new IntersectionObserver((entries) => {
+  //   for (const entry of entries) {
+  //     if (state?.isShowing && !entry.isIntersecting) {
+  //       state.isShowing = false
+  //       console.log("state.isShowing: ", state.isShowing);
+  //     }
+  //   }
+  // })
+  // const observedElements = new Set<Element>()
   
-  
+  // if (!state?.isShowing) {
+  //   if (referenceEl && observedElements.has(referenceEl as Element)) {
+  //     observer.unobserve(referenceEl as Element)
+  //     observedElements.delete(referenceEl as Element)
+  //   }
+  //   return // we're not currently showing the element, no reason to recompute
+  // }
+
+
+  // if (referenceEl && !observedElements.has(referenceEl as Element)) {
+  //   observer.observe(referenceEl as Element)
+  //   observedElements.add(referenceEl as Element)
+  // }
+
+
   computePosition(referenceEl, floatingEl, {
     placement: state?.directionName,
     middleware: [
-      offset({ mainAxis: state?.distance, crossAxis: state?.skidding }),
+      offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}),
       flip({
         fallbackAxisSideDirection: 'start',
         fallbackStrategy: 'initialPlacement',
@@ -219,6 +219,7 @@ export async function useRecompute(state: AttentionState) {
       let bottom = ''
       let left = ''
 
+      // Calculate the arrow-position depending on if placement has '-start' or 'end':
       if (arrowPlacement === 'start') {
         const value =
           typeof x === 'number'
