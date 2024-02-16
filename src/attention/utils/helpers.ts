@@ -137,7 +137,7 @@ function computeCalloutArrow({
 }
 
 export async function useRecompute(state: AttentionState) {
-  console.log("state.isShowing: ", state.isShowing);
+  console.log("state.isShowing beginning of useRecompute: ", state.isShowing);
   
   if (!state?.isShowing) return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
@@ -156,8 +156,10 @@ export async function useRecompute(state: AttentionState) {
   // const observer: IntersectionObserver = new IntersectionObserver((entries) => {
   //   for (const entry of entries) {
   //     if (state?.isShowing && !entry.isIntersecting) {
+  //       console.log("state.isShowing in observer before setting it to false: ", state.isShowing);
+
   //       state.isShowing = false
-  //       console.log("state.isShowing: ", state.isShowing);
+  //       console.log("state.isShowing in observer after setting it to false: ", state.isShowing);
   //     }
   //   }
   // })
@@ -260,6 +262,131 @@ export async function useRecompute(state: AttentionState) {
 
   return state
 }
+
+// export async function useRecompute(state: AttentionState) {
+//   console.log("state.isShowing beginning of useRecompute: ", state.isShowing);
+  
+//   if (state?.isCallout) {
+//     return computeCalloutArrow(state)
+//   }
+//   const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
+//   const floatingEl: HTMLElement = state?.attentionEl as unknown as HTMLElement
+//   const arrowEl: HTMLElement = state?.arrowEl as unknown as HTMLElement
+
+//   if (!referenceEl || !floatingEl) return
+  
+//   if (!state.isShowing) return // we're not currently showing the element, no reason to recompute
+
+//   // We stop computing the position of the floatingEl when referenceEl is no longer visible:
+//   const observer: IntersectionObserver = new IntersectionObserver((entries) => {
+//     for (const entry of entries) {
+//       if (state?.isShowing && !entry.isIntersecting) {
+//         state.isShowing = false
+//         console.log("state.isShowing in observer: ", state.isShowing);
+//       }
+//     }
+//   })
+//   const observedElements = new Set<Element>()
+
+    
+//     if (referenceEl && observedElements.has(referenceEl as Element)) {
+//       console.log("observedElements: ", observedElements);
+//       observer.unobserve(referenceEl as Element)
+//       observedElements.delete(referenceEl as Element)
+//     }
+  
+//   if (state?.waitForDOM) {
+//     await state?.waitForDOM() // wait for DOM to settle before computing
+//   }
+
+//   if (referenceEl && !observedElements.has(referenceEl as Element)) {
+//     observer.observe(referenceEl as Element)
+//     observedElements.add(referenceEl as Element)
+//   }
+
+
+//   computePosition(referenceEl, floatingEl, {
+//     placement: state?.directionName,
+//     middleware: [
+//       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}),
+//       flip({
+//         fallbackAxisSideDirection: 'start',
+//         fallbackStrategy: 'initialPlacement',
+//       }),
+//       shift({ padding: 16 }),
+//       !state?.noArrow && arrowEl && arrow({ element: arrowEl }),
+//     ],
+//   }).then(({ x, y, middlewareData, placement }) => {
+//     state.actualDirection = placement
+//     console.log('state?.actualDirection: ', state?.actualDirection)
+
+//     Object.assign(floatingEl.style, {
+//       left: `${x}px`,
+//       top: `${y}px`,
+//     })
+
+//     const side = placement.split('-')[0]
+
+//     const staticSide: any = {
+//       top: 'bottom',
+//       right: 'left',
+//       bottom: 'top',
+//       left: 'right',
+//     }[side]
+
+//     const isRtl = window.getComputedStyle(floatingEl).direction === 'rtl'
+//     const arrowDirection: any = opposites[placement]
+//     const arrowPlacement: any = arrowDirection.split('-')[1]
+//     const arrowRotation: any = rotation[arrowDirection]
+
+//     if (middlewareData.arrow) {
+//       const { x, y } = middlewareData.arrow
+//       let top = ''
+//       let right = ''
+//       let bottom = ''
+//       let left = ''
+
+//       // Calculate the arrow-position depending on if placement has '-start' or 'end':
+//       if (arrowPlacement === 'start') {
+//         const value =
+//           typeof x === 'number'
+//             ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)`
+//             : ''
+//         top =
+//           typeof y === 'number'
+//             ? `calc(10px -  ${arrowEl?.offsetWidth / 2}px)`
+//             : ''
+//         right = isRtl ? value : ''
+//         left = isRtl ? '' : value
+//       } else if (arrowPlacement === 'end') {
+//         const value =
+//           typeof x === 'number'
+//             ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)`
+//             : ''
+//         right = isRtl ? '' : value
+//         left = isRtl ? value : ''
+//         bottom =
+//           typeof y === 'number'
+//             ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)`
+//             : ''
+//       } else {
+//         left = typeof x === 'number' ? `${x}px` : ''
+//         top = typeof y === 'number' ? `${y}px` : ''
+//       }
+
+//       Object.assign(arrowEl?.style || {}, {
+//         top,
+//         right,
+//         bottom,
+//         left,
+//         [staticSide]: `${-arrowEl?.offsetWidth / 2}px`,
+//         transform: `rotate(${arrowRotation}deg)`,
+//       })
+//     }
+//   })
+
+//   return state
+// }
 
 export const autoUpdatePosition = (state: AttentionState) => {
   const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
