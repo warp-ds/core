@@ -99,7 +99,7 @@ export type AttentionState = {
   isShowing?: boolean
   isCallout?: boolean
   actualDirection?: Directions
-  directionName: Directions
+  directionName?: Directions
   arrowEl?: HTMLElement | null
   attentionEl?: HTMLElement | null
   fallbackDirection?: FallbackDirection
@@ -120,7 +120,7 @@ const isDirectionVertical = (name: string) =>
 
 function computeCalloutArrow({
   actualDirection,
-  directionName,
+  directionName = 'bottom',
   arrowEl,
 }: AttentionState) {
   if (!arrowEl) return
