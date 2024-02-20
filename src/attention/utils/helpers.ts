@@ -35,8 +35,6 @@ type Directions =
   | 'left-start'
   | 'left-end'
 
-type FallbackDirection = 'none' | 'start' | 'end'
-
 export const opposites = {
   [TOPSTART]: BOTTOMEND,
   [TOP]: BOTTOM,
@@ -102,7 +100,8 @@ export type AttentionState = {
   directionName?: Directions
   arrowEl?: HTMLElement | null
   attentionEl?: HTMLElement | null
-  fallbackDirection?: FallbackDirection
+  flip?: Boolean
+  fallbackPlacements?: Directions[]
   targetEl?: unknown
   tooltip?: Boolean
   popover?: Boolean
@@ -185,9 +184,10 @@ export async function useRecompute(state: AttentionState) {
     placement: state?.directionName ?? 'bottom',
     middleware: [
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}),
-      flip({
+      state?.flip && flip({
         fallbackAxisSideDirection: 'start',
         fallbackStrategy: 'initialPlacement',
+        fallbackPlacements: state?.fallbackPlacements
       }),
       shift({ padding: 16 }),
       !state?.noArrow && arrowEl && arrow({ element: arrowEl }),
