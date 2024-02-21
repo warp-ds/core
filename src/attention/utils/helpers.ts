@@ -143,9 +143,7 @@ export async function useRecompute(state: AttentionState) {
   if (state?.waitForDOM) {
     await state?.waitForDOM() // wait for DOM to settle before computing
   }
-  if (state?.isCallout) {
-    return computeCalloutArrow(state)
-  }
+  if (state?.isCallout) return computeCalloutArrow(state)
 
   const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state?.attentionEl as unknown as HTMLElement
