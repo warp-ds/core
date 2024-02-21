@@ -144,18 +144,19 @@ export async function useRecompute(state: AttentionState) {
     await state?.waitForDOM() // wait for DOM to settle before computing
   }
   if (state?.isCallout) return computeCalloutArrow(state)
-
+  
   const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state?.attentionEl as unknown as HTMLElement
   const arrowEl: HTMLElement = state?.arrowEl as unknown as HTMLElement
   
   if (!referenceEl || !floatingEl) return
- 
+  
   computePosition(referenceEl, floatingEl, {
     placement: state?.directionName ?? 'bottom',
     middleware: [
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}),
       state?.flip && flip({
+        fallbackAxisSideDirection: 'start',
         fallbackPlacements: state?.fallbackPlacements
       }),
       shift({ padding: 16}),
