@@ -150,34 +150,7 @@ export async function useRecompute(state: AttentionState) {
   const arrowEl: HTMLElement = state?.arrowEl as unknown as HTMLElement
   
   if (!referenceEl || !floatingEl) return
-  // We stop computing the position of the floatingEl when referenceEl is no longer visible:
-  // const observer: IntersectionObserver = new IntersectionObserver((entries) => {
-  //   for (const entry of entries) {
-  //     if (state?.isShowing && !entry.isIntersecting) {
-  //       console.log("state.isShowing in observer before setting it to false: ", state.isShowing);
-
-  //       state.isShowing = false
-  //       console.log("state.isShowing in observer after setting it to false: ", state.isShowing);
-  //     }
-  //   }
-  // })
-  // const observedElements = new Set<Element>()
-  
-  // if (!state?.isShowing) {
-  //   if (referenceEl && observedElements.has(referenceEl as Element)) {
-  //     observer.unobserve(referenceEl as Element)
-  //     observedElements.delete(referenceEl as Element)
-  //   }
-  //   return // we're not currently showing the element, no reason to recompute
-  // }
-
-
-  // if (referenceEl && !observedElements.has(referenceEl as Element)) {
-  //   observer.observe(referenceEl as Element)
-  //   observedElements.add(referenceEl as Element)
-  // }
-
-
+ 
   computePosition(referenceEl, floatingEl, {
     placement: state?.directionName ?? 'bottom',
     middleware: [
@@ -187,7 +160,6 @@ export async function useRecompute(state: AttentionState) {
         fallbackStrategy: 'initialPlacement',
         fallbackPlacements: state?.fallbackPlacements
       }),
-      shift({ padding: 16 }),
       !state?.noArrow && arrowEl && arrow({ element: arrowEl }),
     ],
   }).then(({ x, y, middlewareData, placement }) => {
