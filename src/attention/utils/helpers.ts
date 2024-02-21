@@ -156,10 +156,9 @@ export async function useRecompute(state: AttentionState) {
     middleware: [
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}),
       state?.flip && flip({
-        fallbackAxisSideDirection: 'start',
-        fallbackStrategy: 'initialPlacement',
         fallbackPlacements: state?.fallbackPlacements
       }),
+      shift({ padding: 16}),
       !state?.noArrow && arrowEl && arrow({ element: arrowEl }),
     ],
   }).then(({ x, y, middlewareData, placement }) => {
