@@ -136,9 +136,6 @@ function computeCalloutArrow({
 }
 
 export async function useRecompute(state: AttentionState) {
-  console.log("state.isShowing beginning of useRecompute: ", state?.isShowing);
-  
-  
   if (!state?.isShowing) return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
     await state?.waitForDOM() // wait for DOM to settle before computing
@@ -154,8 +151,8 @@ export async function useRecompute(state: AttentionState) {
   computePosition(referenceEl, floatingEl, {
     placement: state?.directionName ?? 'bottom',
     middleware: [
-      offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}),
-      state?.flip && flip({
+      offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl (floatingEl) towards its targetEl (referenceEl) both on the x and y axis (horizontally and vertically).
+      state?.flip && flip({ //when flip is set to true it will move the attentionEl's (floatingEl's) placement to its opposite side or to the preferred placements if fallbackPlacements has a value
         fallbackAxisSideDirection: 'start',
         fallbackPlacements: state?.fallbackPlacements
       }),
@@ -164,7 +161,6 @@ export async function useRecompute(state: AttentionState) {
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
-    console.log('state?.actualDirection: ', state?.actualDirection)
 
     Object.assign(floatingEl.style, {
       left: `${x}px`,
@@ -180,7 +176,7 @@ export async function useRecompute(state: AttentionState) {
       left: 'right',
     }[side]
 
-    const isRtl = window.getComputedStyle(floatingEl).direction === 'rtl'
+    const isRtl = window.getComputedStyle(floatingEl).direction === 'rtl' //checks whether the text direction of the attentionEl (floatingEl) is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
     const arrowDirection: any = opposites[placement]
     const arrowPlacement: any = arrowDirection.split('-')[1]
     const arrowRotation: any = rotation[arrowDirection]
@@ -192,7 +188,7 @@ export async function useRecompute(state: AttentionState) {
       let bottom = ''
       let left = ''
 
-      // Calculate the arrow-position depending on if placement has '-start' or 'end':
+      // calculates the arrow-position depending on if placement has '-start' or 'end'.:
       if (arrowPlacement === 'start') {
         const value =
           typeof x === 'number'
@@ -237,6 +233,10 @@ export async function useRecompute(state: AttentionState) {
 export const autoUpdatePosition = (state: AttentionState) => {
   const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
   const floatingEl: HTMLElement = state?.attentionEl as HTMLElement
+
+  // computePosition is only run once, so we need to wrap autoUpdate() around useRecompute() in order to recompute the attentionEl's (floatingEl's) position
+  // autoUpdate add event listeners that are triggered on resize and on scroll and will keep calling the useRecompute(). 
+  // autoUpdate returns a cleanup() function that removes the event listeners.
   return autoUpdate(referenceEl, floatingEl, () => {
     useRecompute(state)
   })
