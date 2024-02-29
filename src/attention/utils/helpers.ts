@@ -8,18 +8,18 @@ import {
   ReferenceElement,
 } from '@floating-ui/dom'
 
-const TOPSTART = 'top-start'
+const TOP_START = 'top-start'
 const TOP = 'top'
-const TOPEND = 'top-end'
-const RIGHTSTART = 'right-start'
+const TOP_END = 'top-end'
+const RIGHT_START = 'right-start'
 const RIGHT = 'right'
-const RIGHTEND = 'right-end'
-const BOTTOMSTART = 'bottom-start'
+const RIGHT_END = 'right-end'
+const BOTTOM_START = 'bottom-start'
 const BOTTOM = 'bottom'
-const BOTTOMEND = 'bottom-end'
-const LEFTSTART = 'left-start'
+const BOTTOM_END = 'bottom-end'
+const LEFT_START = 'left-start'
 const LEFT = 'left'
-const LEFTEND = 'left-end'
+const LEFT_END = 'left-end'
 
 type Directions =
   | 'top'
@@ -36,61 +36,61 @@ type Directions =
   | 'left-end'
 
 export const opposites = {
-  [TOPSTART]: BOTTOMEND,
+  [TOP_START]: BOTTOM_END,
   [TOP]: BOTTOM,
-  [TOPEND]: BOTTOMSTART,
-  [BOTTOMSTART]: TOPEND,
+  [TOP_END]: BOTTOM_START,
+  [BOTTOM_START]: TOP_END,
   [BOTTOM]: TOP,
-  [BOTTOMEND]: TOPSTART,
-  [LEFTSTART]: RIGHTEND,
+  [BOTTOM_END]: TOP_START,
+  [LEFT_START]: RIGHT_END,
   [LEFT]: RIGHT,
-  [LEFTEND]: RIGHTSTART,
-  [RIGHTSTART]: LEFTEND,
+  [LEFT_END]: RIGHT_START,
+  [RIGHT_START]: LEFT_END,
   [RIGHT]: LEFT,
-  [RIGHTEND]: LEFTSTART,
+  [RIGHT_END]: LEFT_START,
 }
 
 export const arrowLabels = {
-  [TOPSTART]: '↑',
+  [TOP_START]: '↑',
   [TOP]: '↑',
-  [TOPEND]: '↑',
-  [BOTTOMSTART]: '↓',
+  [TOP_END]: '↑',
+  [BOTTOM_START]: '↓',
   [BOTTOM]: '↓',
-  [BOTTOMEND]: '↓',
-  [LEFTSTART]: '←',
+  [BOTTOM_END]: '↓',
+  [LEFT_START]: '←',
   [LEFT]: '←',
-  [LEFTEND]: '←',
-  [RIGHTSTART]: '→',
+  [LEFT_END]: '←',
+  [RIGHT_START]: '→',
   [RIGHT]: '→',
-  [RIGHTEND]: '→',
+  [RIGHT_END]: '→',
 }
 export const directions = [
-  TOPSTART,
+  TOP_START,
   TOP,
-  TOPEND,
-  BOTTOMSTART,
+  TOP_END,
+  BOTTOM_START,
   BOTTOM,
-  BOTTOMEND,
-  LEFTSTART,
+  BOTTOM_END,
+  LEFT_START,
   LEFT,
-  LEFTEND,
-  RIGHTSTART,
+  LEFT_END,
+  RIGHT_START,
   RIGHT,
-  RIGHTEND,
+  RIGHT_END,
 ]
 export const rotation: any = {
-  [LEFTSTART]: -45,
+  [LEFT_START]: -45,
   [LEFT]: -45,
-  [LEFTEND]: -45,
-  [TOPSTART]: 45,
+  [LEFT_END]: -45,
+  [TOP_START]: 45,
   [TOP]: 45,
-  [TOPEND]: 45,
-  [RIGHTSTART]: 135,
+  [TOP_END]: 45,
+  [RIGHT_START]: 135,
   [RIGHT]: 135,
-  [RIGHTEND]: 135,
-  [BOTTOMSTART]: -135,
+  [RIGHT_END]: 135,
+  [BOTTOM_START]: -135,
   [BOTTOM]: -135,
-  [BOTTOMEND]: -135,
+  [BOTTOM_END]: -135,
 }
 
 export type AttentionState = {
@@ -102,11 +102,7 @@ export type AttentionState = {
   attentionEl?: HTMLElement | null
   flip?: Boolean
   fallbackPlacements?: Directions[]
-  targetEl?: unknown
-  tooltip?: Boolean
-  popover?: Boolean
-  callout?: Boolean
-  highlight?: Boolean
+  targetEl?: ReferenceElement | null
   noArrow?: Boolean
   distance?: number
   skidding?: number
@@ -114,8 +110,8 @@ export type AttentionState = {
 }
 
 const middlePosition = 'calc(50% - 7px)'
-const isDirectionVertical = (name: string) =>
-  [TOPSTART, TOP, TOPEND, BOTTOMSTART, BOTTOM, BOTTOMEND].includes(name)
+const isDirectionVertical = (name: Directions) =>
+  [TOP_START, TOP, TOP_END, BOTTOM_START, BOTTOM, BOTTOM_END].includes(name)
 
 function computeCalloutArrow({
   actualDirection,
@@ -142,17 +138,18 @@ export async function useRecompute(state: AttentionState) {
   }
   if (state?.isCallout) return computeCalloutArrow(state)
   
-  const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
-  const floatingEl: HTMLElement = state?.attentionEl as unknown as HTMLElement
-  const arrowEl: HTMLElement = state?.arrowEl as unknown as HTMLElement
+  if (!state?.targetEl || !state?.attentionEl) return
   
-  if (!referenceEl || !floatingEl) return
+  const targetEl = state?.targetEl
+  const attentionEl = state?.attentionEl
+  const arrowEl = state?.arrowEl
   
-  computePosition(referenceEl, floatingEl, {
+  
+  computePosition(targetEl, attentionEl, {
     placement: state?.directionName ?? 'bottom',
     middleware: [
-      offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl (floatingEl) towards its targetEl (referenceEl) both on the x and y axis (horizontally and vertically).
-      state?.flip && flip({ //when flip is set to true it will move the attentionEl's (floatingEl's) placement to its opposite side or to the preferred placements if fallbackPlacements has a value
+      offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
+      state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
         fallbackAxisSideDirection: 'start',
         fallbackPlacements: state?.fallbackPlacements
       }),
@@ -162,10 +159,10 @@ export async function useRecompute(state: AttentionState) {
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
 
-    Object.assign(floatingEl.style, {
-      left: `${x}px`,
-      top: `${y}px`,
-    })
+      Object.assign(attentionEl?.style, {
+        left: `${x}px`,
+        top: `${y}px`,
+      })
 
     const side = placement.split('-')[0]
 
@@ -176,12 +173,12 @@ export async function useRecompute(state: AttentionState) {
       left: 'right',
     }[side]
 
-    const isRtl = window.getComputedStyle(floatingEl).direction === 'rtl' //checks whether the text direction of the attentionEl (floatingEl) is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
+    const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
     const arrowDirection: any = opposites[placement]
     const arrowPlacement: any = arrowDirection.split('-')[1]
     const arrowRotation: any = rotation[arrowDirection]
 
-    if (middlewareData.arrow) {
+    if (middlewareData.arrow && arrowEl) {
       const { x, y } = middlewareData.arrow
       let top = ''
       let right = ''
@@ -231,13 +228,11 @@ export async function useRecompute(state: AttentionState) {
 }
 
 export const autoUpdatePosition = (state: AttentionState) => {
-  const referenceEl: ReferenceElement = state?.targetEl as ReferenceElement
-  const floatingEl: HTMLElement = state?.attentionEl as HTMLElement
-
-  // computePosition is only run once, so we need to wrap autoUpdate() around useRecompute() in order to recompute the attentionEl's (floatingEl's) position
+  // computePosition is only run once, so we need to wrap autoUpdate() around useRecompute() in order to recompute the attentionEl's position
   // autoUpdate add event listeners that are triggered on resize and on scroll and will keep calling the useRecompute(). 
   // autoUpdate returns a cleanup() function that removes the event listeners.
-  return autoUpdate(referenceEl, floatingEl, () => {
+  if (!state?.targetEl || !state?.attentionEl) return 
+  return autoUpdate(state?.targetEl, state?.attentionEl, () => {
     useRecompute(state)
   })
 }

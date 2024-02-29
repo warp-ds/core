@@ -33,7 +33,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "typescript": "^4.7.4",
-    "@floating-ui/dom": "^1.6.1",
+    "@floating-ui/dom": "1.6.3",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "semantic-release": "^22.0.7",
