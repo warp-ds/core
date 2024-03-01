@@ -144,13 +144,12 @@ export async function useRecompute(state: AttentionState) {
   const targetEl: ReferenceElement = state?.targetEl
   const attentionEl: HTMLElement = state?.attentionEl
   
-  
   computePosition(targetEl, attentionEl, {
     placement: state?.directionName ?? 'bottom',
     middleware: [
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
       state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
-        fallbackAxisSideDirection: 'start',
+        fallbackAxisSideDirection: 'start', // the preferred placement axis fit when flip is set to true and fallbackPlacements does not have a value. 'start' represents 'top' or 'left'.
         fallbackPlacements: state?.fallbackPlacements
       }),
       shift({ padding: 16}),
