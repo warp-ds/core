@@ -8,19 +8,6 @@ import {
   ReferenceElement,
 } from '@floating-ui/dom'
 
-const TOP_START = 'top-start'
-const TOP = 'top'
-const TOP_END = 'top-end'
-const RIGHT_START = 'right-start'
-const RIGHT = 'right'
-const RIGHT_END = 'right-end'
-const BOTTOM_START = 'bottom-start'
-const BOTTOM = 'bottom'
-const BOTTOM_END = 'bottom-end'
-const LEFT_START = 'left-start'
-const LEFT = 'left'
-const LEFT_END = 'left-end'
-
 type Directions =
   | 'top'
   | 'top-start'
@@ -34,8 +21,22 @@ type Directions =
   | 'left'
   | 'left-start'
   | 'left-end'
+  
+const TOP_START: Directions = 'top-start'
+const TOP: Directions = 'top'
+const TOP_END: Directions = 'top-end'
+const RIGHT_START: Directions = 'right-start'
+const RIGHT: Directions = 'right'
+const RIGHT_END: Directions = 'right-end'
+const BOTTOM_START: Directions = 'bottom-start'
+const BOTTOM: Directions = 'bottom'
+const BOTTOM_END: Directions = 'bottom-end'
+const LEFT_START: Directions = 'left-start'
+const LEFT: Directions = 'left'
+const LEFT_END: Directions = 'left-end'
 
-export const opposites = {
+
+export const opposites: Record<Directions, Directions> = {
   [TOP_START]: BOTTOM_END,
   [TOP]: BOTTOM,
   [TOP_END]: BOTTOM_START,
@@ -50,7 +51,7 @@ export const opposites = {
   [RIGHT_END]: LEFT_START,
 }
 
-export const arrowLabels = {
+export const arrowLabels: Record<Directions, string> = {
   [TOP_START]: '↑',
   [TOP]: '↑',
   [TOP_END]: '↑',
@@ -64,7 +65,7 @@ export const arrowLabels = {
   [RIGHT]: '→',
   [RIGHT_END]: '→',
 }
-export const directions = [
+export const directions: Directions[] = [
   TOP_START,
   TOP,
   TOP_END,
@@ -78,7 +79,7 @@ export const directions = [
   RIGHT,
   RIGHT_END,
 ]
-export const rotation: any = {
+export const rotation: Record<Directions, number> = {
   [LEFT_START]: -45,
   [LEFT]: -45,
   [LEFT_END]: -45,
@@ -109,9 +110,9 @@ export type AttentionState = {
   waitForDOM?: () => void
 }
 
-const middlePosition = 'calc(50% - 7px)'
+const middlePosition: string = 'calc(50% - 7px)'
 const isDirectionVertical = (name: Directions) =>
-  [TOP_START, TOP, TOP_END, BOTTOM_START, BOTTOM, BOTTOM_END].includes(name)
+  ([TOP_START, TOP, TOP_END, BOTTOM_START, BOTTOM, BOTTOM_END] as Directions[]).includes(name)
 
 function computeCalloutArrow({
   actualDirection,
@@ -122,10 +123,10 @@ function computeCalloutArrow({
 
   actualDirection = directionName
 
-  const arrowDirection = opposites[actualDirection]
-  const arrowRotation = rotation[arrowDirection]
+  const arrowDirection: Directions = opposites[actualDirection]
+  const arrowRotation: number = rotation[arrowDirection]
 
-  const directionIsVertical = isDirectionVertical(directionName)
+  const directionIsVertical: boolean = isDirectionVertical(directionName)
   arrowEl.style.left = directionIsVertical ? middlePosition : ''
   arrowEl.style.top = !directionIsVertical ? middlePosition : ''
   arrowEl.style.transform = `rotate(${arrowRotation}deg)`
@@ -140,9 +141,8 @@ export async function useRecompute(state: AttentionState) {
   
   if (!state?.targetEl || !state?.attentionEl) return
   
-  const targetEl = state?.targetEl
-  const attentionEl = state?.attentionEl
-  const arrowEl = state?.arrowEl
+  const targetEl: ReferenceElement = state?.targetEl
+  const attentionEl: HTMLElement = state?.attentionEl
   
   
   computePosition(targetEl, attentionEl, {
@@ -154,38 +154,32 @@ export async function useRecompute(state: AttentionState) {
         fallbackPlacements: state?.fallbackPlacements
       }),
       shift({ padding: 16}),
-      !state?.noArrow && arrowEl && arrow({ element: arrowEl }),
+      !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
-
-      Object.assign(attentionEl?.style, {
-        left: `${x}px`,
-        top: `${y}px`,
-      })
-
-    const side = placement.split('-')[0]
-
-    const staticSide: any = {
-      top: 'bottom',
-      right: 'left',
-      bottom: 'top',
-      left: 'right',
-    }[side]
-
+    
+    Object.assign(attentionEl?.style, {
+      left: `${x}px`,
+      top: `${y}px`,
+    })
+    
+    const side: Directions = placement.split('-')[0] as Directions
+    const staticSide: Directions = opposites[side]
     const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
-    const arrowDirection: any = opposites[placement]
-    const arrowPlacement: any = arrowDirection.split('-')[1]
-    const arrowRotation: any = rotation[arrowDirection]
-
-    if (middlewareData.arrow && arrowEl) {
+    const arrowDirection: Directions = opposites[placement]
+    const arrowPlacement: string = arrowDirection.split('-')[1]
+    const arrowRotation: number = rotation[arrowDirection]
+    
+    if (middlewareData.arrow && state?.arrowEl) {
+      const arrowEl: HTMLElement = state?.arrowEl
       const { x, y } = middlewareData.arrow
       let top = ''
       let right = ''
       let bottom = ''
       let left = ''
 
-      // calculates the arrow-position depending on if placement has '-start' or 'end'.:
+      // calculates the arrow-position depending on if placement has '-start' or 'end':
       if (arrowPlacement === 'start') {
         const value =
           typeof x === 'number'
