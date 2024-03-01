@@ -178,7 +178,7 @@ export async function useRecompute(state: AttentionState) {
       let bottom = ''
       let left = ''
 
-      // calculates the arrow-position depending on if placement has '-start' or 'end':
+      // calculates the arrow-position depending on if placement has 'start' or 'end':
       if (arrowPlacement === 'start') {
         const value =
           typeof x === 'number'
@@ -222,7 +222,7 @@ export async function useRecompute(state: AttentionState) {
 
 export const autoUpdatePosition = (state: AttentionState) => {
   // computePosition is only run once, so we need to wrap autoUpdate() around useRecompute() in order to recompute the attentionEl's position
-  // autoUpdate add event listeners that are triggered on resize and on scroll and will keep calling the useRecompute(). 
+  // autoUpdate adds event listeners that are triggered on resize and on scroll and will keep calling the useRecompute(). 
   // autoUpdate returns a cleanup() function that removes the event listeners.
   if (!state?.targetEl || !state?.attentionEl) return 
   return autoUpdate(state?.targetEl, state?.attentionEl, () => {
