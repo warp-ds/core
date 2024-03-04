@@ -170,9 +170,9 @@ export async function useRecompute(state: AttentionState) {
     const arrowPlacement: string = arrowDirection.split('-')[1]
     const arrowRotation: number = rotation[arrowDirection]
     
-    if (middlewareData.arrow && state?.arrowEl) {
+    if (middlewareData?.arrow && state?.arrowEl) {
       const arrowEl: HTMLElement = state?.arrowEl
-      const { x, y } = middlewareData.arrow
+      const { x, y } = middlewareData?.arrow
       let top = ''
       let right = ''
       let bottom = ''
