@@ -8,7 +8,7 @@ import {
   ReferenceElement,
 } from '@floating-ui/dom'
 
-type Directions =
+export type Directions =
   | 'top'
   | 'top-start'
   | 'top-end'
@@ -51,35 +51,7 @@ export const opposites: Record<Directions, Directions> = {
   [RIGHT_END]: LEFT_START,
 }
 
-export const arrowLabels: Record<Directions, string> = {
-  [TOP_START]: '↑',
-  [TOP]: '↑',
-  [TOP_END]: '↑',
-  [BOTTOM_START]: '↓',
-  [BOTTOM]: '↓',
-  [BOTTOM_END]: '↓',
-  [LEFT_START]: '←',
-  [LEFT]: '←',
-  [LEFT_END]: '←',
-  [RIGHT_START]: '→',
-  [RIGHT]: '→',
-  [RIGHT_END]: '→',
-}
-export const directions: Directions[] = [
-  TOP_START,
-  TOP,
-  TOP_END,
-  BOTTOM_START,
-  BOTTOM,
-  BOTTOM_END,
-  LEFT_START,
-  LEFT,
-  LEFT_END,
-  RIGHT_START,
-  RIGHT,
-  RIGHT_END,
-]
-export const rotation: Record<Directions, number> = {
+const rotation: Record<Directions, number> = {
   [LEFT_START]: -45,
   [LEFT]: -45,
   [LEFT_END]: -45,
