@@ -23,6 +23,9 @@
   "files": [
     "dist"
   ],
+  "peerDependencies": {
+    "@floating-ui/dom": "1.6.3"
+  },
   "scripts": {
     "commit": "cz",
     "build": "tsc",
