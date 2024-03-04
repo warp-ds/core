@@ -83,12 +83,14 @@ export type AttentionState = {
 }
 
 const middlePosition: string = 'calc(50% - 7px)'
-const isDirectionVertical = (name: Directions) =>
+const isDirectionVertical = (name: Directions): boolean =>
   ([TOP_START, TOP, TOP_END, BOTTOM_START, BOTTOM, BOTTOM_END] as Directions[]).includes(name)
+
+  const defaultDirectionName: Directions = 'bottom'
 
 function computeCalloutArrow({
   actualDirection,
-  directionName = 'bottom',
+  directionName = defaultDirectionName,
   arrowEl,
 }: AttentionState) {
   if (!arrowEl) return
@@ -117,7 +119,7 @@ export async function useRecompute(state: AttentionState) {
   const attentionEl: HTMLElement = state?.attentionEl
   
   computePosition(targetEl, attentionEl, {
-    placement: state?.directionName ?? 'bottom',
+    placement: state?.directionName ?? defaultDirectionName,
     middleware: [
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
       state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
