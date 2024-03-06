@@ -36,18 +36,18 @@ const LEFT: Directions = 'left'
 const LEFT_END: Directions = 'left-end'
 
 export const directions: Directions[] = [
-  'top-start',
-  'top',
-  'top-end',
-  'right-start',
-  'right',
-  'right-end',
-  'bottom-start',
-  'bottom',
-  'bottom-end',
-  'left-start',
-  'left',
-  'left-end']
+  TOP_START,
+  TOP,
+  TOP_END,
+  RIGHT_START,
+  RIGHT,
+  RIGHT_END,
+  BOTTOM_START,
+  BOTTOM,
+  BOTTOM_END,
+  LEFT_START,
+  LEFT,
+  LEFT_END]
 
 export const opposites: Record<Directions, Directions> = {
   [TOP_START]: BOTTOM_END,
