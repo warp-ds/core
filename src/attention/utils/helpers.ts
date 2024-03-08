@@ -99,20 +99,21 @@ const middlePosition: string = 'calc(50% - 7px)'
 const isDirectionVertical = (name: Directions): boolean =>
   ([TOP_START, TOP, TOP_END, BOTTOM_START, BOTTOM, BOTTOM_END] as Directions[]).includes(name)
 
-export const arrowDirectionClassname = (dir: string) => {
-    let direction: string
+export const arrowDirectionClassname = (dir: Directions) => {
+    let direction: Directions
     if (/-/.test(dir)) {
       direction = dir
         .split('-')
         .map((d) => d.charAt(0).toUpperCase() + d.slice(1))
-        .join('')
+        .join('') as Directions
     } else {
-      direction = dir.charAt(0).toUpperCase() + dir.slice(1)
+      direction = dir.charAt(0).toUpperCase() + dir.slice(1) as Directions
     }
     return `${direction}`
   }
 
-  const side = (actualDirection: Directions): Directions => actualDirection.split('-')[0] as Directions
+  const side = (dir: Directions): Directions => dir.split('-')[0] as Directions
+  const staticSide = (dir: Directions): Directions => opposites[side(dir)]
 
   function computeCalloutArrow({
     actualDirection,
@@ -132,7 +133,7 @@ export const arrowDirectionClassname = (dir: string) => {
     left: directionIsVertical ? middlePosition : '',
     top: !directionIsVertical ? middlePosition : '',
     // border alignment is off by a fraction of a pixel, this fixes it
-    [`margin${arrowDirectionClassname(opposites[side(actualDirection)])}`]: '-0.5px',
+    [`margin${arrowDirectionClassname(staticSide(actualDirection))}`]: '-0.5px',
     transform: `rotate(${arrowRotation}deg)`,
   })
 }
@@ -167,7 +168,6 @@ export async function useRecompute(state: AttentionState) {
       left: `${x}px`,
       top: `${y}px`,
     })
-    const staticSide: Directions = opposites[side(placement)]
     const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
     const arrowDirection: Directions = opposites[placement]
     const arrowPlacement: string = arrowDirection.split('-')[1]
@@ -215,7 +215,7 @@ export async function useRecompute(state: AttentionState) {
         bottom,
         left,
         // border alignment is off by a fraction of a pixel, this fixes it
-        [`margin${arrowDirectionClassname(staticSide)}`]: '-0.5px',
+        [`margin${arrowDirectionClassname(staticSide(placement))}`]: '-0.5px',
         transform: `rotate(${arrowRotation}deg)`,
       })
     }
