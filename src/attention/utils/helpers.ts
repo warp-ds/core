@@ -99,23 +99,42 @@ const middlePosition: string = 'calc(50% - 7px)'
 const isDirectionVertical = (name: Directions): boolean =>
   ([TOP_START, TOP, TOP_END, BOTTOM_START, BOTTOM, BOTTOM_END] as Directions[]).includes(name)
 
+export const arrowDirectionClassname = (dir: string) => {
+    let direction: string
+    if (/-/.test(dir)) {
+      direction = dir
+        .split('-')
+        .map((d) => d.charAt(0).toUpperCase() + d.slice(1))
+        .join('')
+    } else {
+      direction = dir.charAt(0).toUpperCase() + dir.slice(1)
+    }
+    return `${direction}`
+  }
 
-function computeCalloutArrow({
-  actualDirection,
-  directionName = BOTTOM,
-  arrowEl,
-}: AttentionState) {
-  if (!arrowEl) return
+  const side = (actualDirection: Directions): Directions => actualDirection.split('-')[0] as Directions
 
-  actualDirection = directionName
+  function computeCalloutArrow({
+    actualDirection,
+    directionName = BOTTOM,
+    arrowEl,
+  }: AttentionState) {
+    if (!arrowEl) return
+    
+    actualDirection = directionName
 
   const arrowDirection: Directions = opposites[actualDirection]
   const arrowRotation: number = rotation[arrowDirection]
 
   const directionIsVertical: boolean = isDirectionVertical(directionName)
-  arrowEl.style.left = directionIsVertical ? middlePosition : ''
-  arrowEl.style.top = !directionIsVertical ? middlePosition : ''
-  arrowEl.style.transform = `rotate(${arrowRotation}deg)`
+
+  Object.assign(arrowEl?.style || {}, {
+    left: directionIsVertical ? middlePosition : '',
+    top: !directionIsVertical ? middlePosition : '',
+    // border alignment is off by a fraction of a pixel, this fixes it
+    [`margin${arrowDirectionClassname(opposites[side(actualDirection)])}`]: '-0.5px',
+    transform: `rotate(${arrowRotation}deg)`,
+  })
 }
 
 export async function useRecompute(state: AttentionState) {
@@ -148,9 +167,7 @@ export async function useRecompute(state: AttentionState) {
       left: `${x}px`,
       top: `${y}px`,
     })
-    
-    const side: Directions = placement.split('-')[0] as Directions
-    const staticSide: Directions = opposites[side]
+    const staticSide: Directions = opposites[side(placement)]
     const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
     const arrowDirection: Directions = opposites[placement]
     const arrowPlacement: string = arrowDirection.split('-')[1]
@@ -197,7 +214,8 @@ export async function useRecompute(state: AttentionState) {
         right,
         bottom,
         left,
-        [staticSide]: `${-arrowEl?.offsetWidth / 2}px`,
+        // border alignment is off by a fraction of a pixel, this fixes it
+        [`margin${arrowDirectionClassname(staticSide)}`]: '-0.5px',
         transform: `rotate(${arrowRotation}deg)`,
       })
     }
