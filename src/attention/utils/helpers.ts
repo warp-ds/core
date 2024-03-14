@@ -132,6 +132,8 @@ export const arrowDirectionClassname = (dir: Directions) => {
   Object.assign(arrowEl?.style || {}, {
     left: directionIsVertical ? middlePosition : '',
     top: !directionIsVertical ? middlePosition : '',
+    borderTopLeftRadius: '4px',
+    zIndex: 1,
     // border alignment is off by a fraction of a pixel, this fixes it
     [`margin${arrowDirectionClassname(staticSide(actualDirection))}`]: '-0.5px',
     transform: `rotate(${arrowRotation}deg)`,
@@ -214,6 +216,8 @@ export async function useRecompute(state: AttentionState) {
         right,
         bottom,
         left,
+        borderTopLeftRadius: '4px',
+        zIndex: 1,
         // border alignment is off by a fraction of a pixel, this fixes it
         [`margin${arrowDirectionClassname(staticSide(placement))}`]: '-0.5px',
         transform: `rotate(${arrowRotation}deg)`,
