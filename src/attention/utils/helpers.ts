@@ -50,18 +50,18 @@ export const directions: Directions[] = [
   LEFT_END]
 
 export const opposites: Record<Directions, Directions> = {
-  [TOP_START]: BOTTOM_END,
+  [TOP_START]: BOTTOM_START,
   [TOP]: BOTTOM,
-  [TOP_END]: BOTTOM_START,
-  [BOTTOM_START]: TOP_END,
+  [TOP_END]: BOTTOM_END,
+  [BOTTOM_START]: TOP_START,
   [BOTTOM]: TOP,
-  [BOTTOM_END]: TOP_START,
-  [LEFT_START]: RIGHT_END,
+  [BOTTOM_END]: TOP_END,
+  [LEFT_START]: RIGHT_START,
   [LEFT]: RIGHT,
-  [LEFT_END]: RIGHT_START,
-  [RIGHT_START]: LEFT_END,
+  [LEFT_END]: RIGHT_END,
+  [RIGHT_START]: LEFT_START,
   [RIGHT]: LEFT,
-  [RIGHT_END]: LEFT_START,
+  [RIGHT_END]: LEFT_END,
 }
 
 const rotation: Record<Directions, number> = {
