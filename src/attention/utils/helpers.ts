@@ -114,6 +114,8 @@ export const arrowDirectionClassname = (dir: Directions) => {
 
   const side = (dir: Directions): Directions => dir.split('-')[0] as Directions
   const staticSide = (dir: Directions): Directions => opposites[side(dir)]
+  const arrowDirection = (dir: Directions): Directions => opposites[dir]
+  const arrowRotation = (dir: Directions): number => rotation[arrowDirection(dir)]
 
   const applyArrowStyles = (arrowEl: HTMLElement, arrowRotation: number, dir: Directions) => {
     Object.assign(arrowEl?.style, {
@@ -134,16 +136,13 @@ export const arrowDirectionClassname = (dir: Directions) => {
     
     actualDirection = directionName
 
-  const arrowDirection: Directions = opposites[actualDirection]
-  const arrowRotation: number = rotation[arrowDirection]
-
   const directionIsVertical: boolean = isDirectionVertical(directionName)
 
   Object.assign(arrowEl?.style || {}, {
     left: directionIsVertical ? middlePosition : '',
     top: !directionIsVertical ? middlePosition : '',
   })
-  applyArrowStyles(arrowEl, arrowRotation, actualDirection)
+  applyArrowStyles(arrowEl, arrowRotation(actualDirection), actualDirection)
 }
 
 export async function useRecompute(state: AttentionState) {
@@ -177,9 +176,7 @@ export async function useRecompute(state: AttentionState) {
       top: `${y}px`,
     })
     const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
-    const arrowDirection: Directions = opposites[placement]
-    const arrowPlacement: string = arrowDirection.split('-')[1]
-    const arrowRotation: number = rotation[arrowDirection]
+    const arrowPlacement: string = arrowDirection(placement).split('-')[1]
     
     if (middlewareData?.arrow && state?.arrowEl) {
       const arrowEl: HTMLElement = state?.arrowEl
@@ -223,7 +220,7 @@ export async function useRecompute(state: AttentionState) {
         bottom,
         left,
       })
-      applyArrowStyles(arrowEl, arrowRotation, placement)
+      applyArrowStyles(arrowEl, arrowRotation(placement), placement)
     }
   })
 
