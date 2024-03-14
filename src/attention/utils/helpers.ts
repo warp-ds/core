@@ -190,24 +190,24 @@ export async function useRecompute(state: AttentionState) {
       if (arrowPlacement === 'start') {
         const value =
           typeof x === 'number'
-            ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)`
+            ? `calc(33px - ${arrowEl?.offsetWidth / 2}px)`
             : ''
         top =
           typeof y === 'number'
-            ? `calc(10px -  ${arrowEl?.offsetWidth / 2}px)`
+            ? `calc(33px -  ${arrowEl?.offsetWidth / 2}px)`
             : ''
         right = isRtl ? value : ''
         left = isRtl ? '' : value
       } else if (arrowPlacement === 'end') {
         const value =
           typeof x === 'number'
-            ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)`
+            ? `calc(33px - ${arrowEl?.offsetWidth / 2}px)`
             : ''
         right = isRtl ? '' : value
         left = isRtl ? value : ''
         bottom =
           typeof y === 'number'
-            ? `calc(10px - ${arrowEl?.offsetWidth / 2}px)`
+            ? `calc(33px - ${arrowEl?.offsetWidth / 2}px)`
             : ''
       } else {
         left = typeof x === 'number' ? `${x}px` : ''
