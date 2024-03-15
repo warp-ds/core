@@ -6,6 +6,7 @@ import {
   arrow,
   autoUpdate,
   ReferenceElement,
+  autoPlacement,
 } from '@floating-ui/dom'
 
 export type Directions =
@@ -163,8 +164,9 @@ export async function useRecompute(state: AttentionState) {
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
       state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
         fallbackAxisSideDirection: 'start', // the preferred placement axis fit when flip is set to true and fallbackPlacements does not have a value. 'start' represents 'top' or 'left'.
-        fallbackPlacements: state?.fallbackPlacements
+        fallbackPlacements: state?.fallbackPlacements,
       }),
+      !state?.flip && autoPlacement(), // when flip is set to false, it will instead call autoPlacement() that will choose the placement that has the most space available automatically. You can only use either flip() or autoPlacement(), and not combined. 
       shift({ padding: 16}),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
     ],
