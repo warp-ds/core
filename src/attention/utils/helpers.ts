@@ -110,7 +110,7 @@ export const arrowDirectionClassname = (dir: Directions) => {
     } else {
       direction = dir.charAt(0).toUpperCase() + dir.slice(1) as Directions
     }
-    return `${direction}`
+    return direction
   }
 
   const side = (dir: Directions): Directions => dir.split('-')[0] as Directions
