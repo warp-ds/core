@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/warp-ds/core/compare/v1.0.2...v1.1.0) (2024-04-16)
+
+
+### Features
+
+* update how attentionEl's position should be controlled ([#15](https://github.com/warp-ds/core/issues/15)) ([1cae4b0](https://github.com/warp-ds/core/commit/1cae4b0124cc19e1316b3757cdc2376ac375dad9))
+
 ## [1.0.2](https://github.com/warp-ds/core/compare/v1.0.1...v1.0.2) (2023-11-08)
 
 
