@@ -6,7 +6,6 @@ import {
   arrow,
   autoUpdate,
   ReferenceElement,
-  autoPlacement,
 } from '@floating-ui/dom'
 
 export type Directions =
@@ -166,7 +165,6 @@ export async function useRecompute(state: AttentionState) {
         fallbackAxisSideDirection: 'start', // the preferred placement axis fit when flip is set to true and fallbackPlacements does not have a value. 'start' represents 'top' or 'left'.
         fallbackPlacements: state?.fallbackPlacements,
       }),
-      !state?.flip && autoPlacement(), // when flip is set to false, it will instead call autoPlacement() that will choose the placement that has the most space available automatically. You can only use either flip() or autoPlacement(), and not combined. 
       shift({ padding: 16}),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
     ],
