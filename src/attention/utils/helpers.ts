@@ -89,6 +89,7 @@ export type AttentionState = {
   arrowEl?: HTMLElement | null
   attentionEl?: HTMLElement | null
   flip?: Boolean
+  crossAxis?: boolean
   fallbackPlacements?: Directions[]
   targetEl?: ReferenceElement | null
   noArrow?: Boolean
@@ -171,7 +172,7 @@ export async function useRecompute(state: AttentionState) {
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
       state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
         fallbackAxisSideDirection: 'start', // the preferred placement axis fit when flip is set to true and fallbackPlacements does not have a value. 'start' represents 'top' or 'left'.
-        // crossAxis: false,
+        crossAxis: state?.crossAxis,
         fallbackPlacements: state?.fallbackPlacements,
       }),
       shift({ padding: 16}),
