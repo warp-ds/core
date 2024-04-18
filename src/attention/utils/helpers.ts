@@ -6,6 +6,7 @@ import {
   arrow,
   autoUpdate,
   ReferenceElement,
+  hide,
 } from '@floating-ui/dom'
 
 export type Directions =
@@ -82,6 +83,7 @@ const rotation: Record<Directions, number> = {
 export type AttentionState = {
   isShowing?: boolean
   isCallout?: boolean
+  isTooltip?: boolean
   actualDirection?: Directions
   directionName?: Directions
   arrowEl?: HTMLElement | null
@@ -145,6 +147,12 @@ export const arrowDirectionClassname = (dir: Directions) => {
   applyArrowStyles(arrowEl, arrowRotation(actualDirection), actualDirection)
 }
 
+//roundByDPR ensures that the attentionEl is positioned optimally for the screen, since x and y can contain decimals, which could cause blurring. 
+function roundByDPR(value: number) {
+  const dpr = window.devicePixelRatio || 1;
+  return Math.round(value * dpr) / dpr;
+}
+
 export async function useRecompute(state: AttentionState) {
   if (!state?.isShowing) return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
@@ -163,18 +171,29 @@ export async function useRecompute(state: AttentionState) {
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
       state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
         fallbackAxisSideDirection: 'start', // the preferred placement axis fit when flip is set to true and fallbackPlacements does not have a value. 'start' represents 'top' or 'left'.
+        // crossAxis: false,
         fallbackPlacements: state?.fallbackPlacements,
       }),
       shift({ padding: 16}),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
+      hide(),
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
     
     Object.assign(attentionEl?.style, {
-      left: `${x}px`,
-      top: `${y}px`,
-    })
+      top: '0',
+      left: '0',
+      transform: `translate(${roundByDPR(x)}px,${roundByDPR(y)}px)`, //use transform styles instead to position the floating element for increased performance.
+    });
+
+    if (middlewareData.hide && !state.isTooltip) {
+      Object.assign(attentionEl?.style, {
+        visibility: middlewareData.hide.referenceHidden
+        ? 'hidden'
+        : 'visible',
+      })
+    }
     const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
     const arrowPlacement: string = arrowDirection(placement).split('-')[1]
     
