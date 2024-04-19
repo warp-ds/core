@@ -169,7 +169,7 @@ export async function useRecompute(state: AttentionState) {
       }),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
       hide({
-        strategy: 'escaped',
+        strategy: 'escaped', //default strategy is 'referenceHidden'
       }),
       hide(),
     ],
