@@ -177,8 +177,8 @@ export async function useRecompute(state: AttentionState) {
     state.actualDirection = placement
 
     Object.assign(attentionEl?.style, {
-      top: `${y}px`,
       left: `${x}px`,
+      top: `${y}px`,
     });
 
     if (middlewareData.hide && !state.isTooltip) {      
