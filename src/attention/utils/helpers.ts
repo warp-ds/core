@@ -2,7 +2,6 @@ import {
   computePosition,
   flip,
   offset,
-  shift,
   arrow,
   autoUpdate,
   ReferenceElement,
@@ -148,12 +147,6 @@ export const arrowDirectionClassname = (dir: Directions) => {
   applyArrowStyles(arrowEl, arrowRotation(actualDirection), actualDirection)
 }
 
-//roundByDPR ensures that the attentionEl is positioned optimally for the screen, since x and y can contain decimals, which could cause blurring. 
-function roundByDPR(value: number) {
-  const dpr = window.devicePixelRatio || 1;
-  return Math.round(value * dpr) / dpr;
-}
-
 export async function useRecompute(state: AttentionState) {
   if (!state?.isShowing) return // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
@@ -171,11 +164,9 @@ export async function useRecompute(state: AttentionState) {
     middleware: [
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
       state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
-        fallbackAxisSideDirection: 'start', // the preferred placement axis fit when flip is set to true and fallbackPlacements does not have a value. 'start' represents 'top' or 'left'.
         crossAxis: state?.crossAxis,
         fallbackPlacements: state?.fallbackPlacements,
       }),
-      shift({ padding: 16}),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
       hide(),
     ],
@@ -183,9 +174,8 @@ export async function useRecompute(state: AttentionState) {
     state.actualDirection = placement
     
     Object.assign(attentionEl?.style, {
-      top: '0',
-      left: '0',
-      transform: `translate(${roundByDPR(x)}px,${roundByDPR(y)}px)`, //use transform styles instead to position the floating element for increased performance.
+      top: `${y}px`,
+      left: `${x}px`,
     });
 
     if (middlewareData.hide && !state.isTooltip) {
