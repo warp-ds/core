@@ -168,23 +168,27 @@ export async function useRecompute(state: AttentionState) {
         fallbackPlacements: state?.fallbackPlacements,
       }),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
+      hide({
+        strategy: 'escaped',
+      }),
       hide(),
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
-    
+
     Object.assign(attentionEl?.style, {
       top: `${y}px`,
       left: `${x}px`,
     });
 
-    if (middlewareData.hide && !state.isTooltip) {
+    if (middlewareData.hide && !state.isTooltip) {      
+      const { escaped, referenceHidden } = middlewareData.hide
       Object.assign(attentionEl?.style, {
-        visibility: middlewareData.hide.referenceHidden
-        ? 'hidden'
-        : 'visible',
+        visibility: referenceHidden ? 'hidden' : 'visible',
+        opacity: escaped ? '0.5' : '',
       })
     }
+    
     const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
     const arrowPlacement: string = arrowDirection(placement).split('-')[1]
     
