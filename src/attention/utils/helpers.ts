@@ -181,8 +181,8 @@ export async function useRecompute(state: AttentionState) {
       top: `${y}px`,
     });
 
-    if (middlewareData.hide && !state.isTooltip) {      
-      const { escaped, referenceHidden } = middlewareData.hide
+    if (middlewareData?.hide && !state?.isTooltip) {      
+      const { escaped, referenceHidden } = middlewareData?.hide
       Object.assign(attentionEl?.style, {
         visibility: referenceHidden ? 'hidden' : 'visible',
         opacity: escaped ? '0.5' : '',
