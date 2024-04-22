@@ -171,7 +171,7 @@ export async function useRecompute(state: AttentionState) {
       hide({ //will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies
         strategy: 'escaped', //default strategy is 'referenceHidden'
       }),
-      hide(), // we call hide again here to also trigger the 'referenceHidden' strategy. 
+      hide(), // we call hide() again here to also trigger the 'referenceHidden' strategy. 
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
