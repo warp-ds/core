@@ -82,7 +82,6 @@ const rotation: Record<Directions, number> = {
 export type AttentionState = {
   isShowing?: boolean
   isCallout?: boolean
-  isTooltip?: boolean
   actualDirection?: Directions
   directionName?: Directions
   arrowEl?: HTMLElement | null
@@ -175,16 +174,16 @@ export async function useRecompute(state: AttentionState) {
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
-
+    
     Object.assign(attentionEl?.style, {
       left: `${x}px`,
       top: `${y}px`,
     });
 
-    if (middlewareData?.hide && !state?.isTooltip) {      
+    if (middlewareData?.hide && !state?.isCallout) {      
       const { escaped, referenceHidden } = middlewareData?.hide
       Object.assign(attentionEl?.style, {
-        visibility: referenceHidden ? 'hidden' : 'visible',
+        visibility: referenceHidden ? 'hidden' : '',
         opacity: escaped ? '0.5' : '',
       })
     }
