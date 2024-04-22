@@ -164,11 +164,11 @@ export async function useRecompute(state: AttentionState) {
     middleware: [
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
       state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
-        crossAxis: state?.crossAxis,
+        crossAxis: state?.crossAxis, //checks overflow to trigger a flip. When disabled, it will ignore overflow
         fallbackPlacements: state?.fallbackPlacements,
       }),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
-      hide({
+      hide({ //will hide the attentionEl when it appears detached from the targetEl 
         strategy: 'escaped', //default strategy is 'referenceHidden'
       }),
       hide(),
