@@ -171,7 +171,6 @@ export async function useRecompute(state: AttentionState) {
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
-    console.log("middlewareData?.hide:", middlewareData?.hide);
     
     Object.assign(attentionEl?.style, {
       left: `${x}px`,
