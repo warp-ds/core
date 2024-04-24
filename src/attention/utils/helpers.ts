@@ -2,11 +2,10 @@ import {
   computePosition,
   flip,
   offset,
-  shift,
   arrow,
   autoUpdate,
   ReferenceElement,
-  autoPlacement,
+  hide,
 } from '@floating-ui/dom'
 
 export type Directions =
@@ -88,6 +87,7 @@ export type AttentionState = {
   arrowEl?: HTMLElement | null
   attentionEl?: HTMLElement | null
   flip?: Boolean
+  crossAxis?: boolean
   fallbackPlacements?: Directions[]
   targetEl?: ReferenceElement | null
   noArrow?: Boolean
@@ -163,12 +163,11 @@ export async function useRecompute(state: AttentionState) {
     middleware: [
       offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
       state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
-        fallbackAxisSideDirection: 'start', // the preferred placement axis fit when flip is set to true and fallbackPlacements does not have a value. 'start' represents 'top' or 'left'.
+        crossAxis: state?.crossAxis, //checks overflow to trigger a flip. When disabled, it will ignore overflow
         fallbackPlacements: state?.fallbackPlacements,
       }),
-      !state?.flip && autoPlacement(), // when flip is set to false, it will instead call autoPlacement() that will choose the placement that has the most space available automatically. You can only use either flip() or autoPlacement(), and not combined. 
-      shift({ padding: 16}),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
+      hide(), //will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement
@@ -176,7 +175,15 @@ export async function useRecompute(state: AttentionState) {
     Object.assign(attentionEl?.style, {
       left: `${x}px`,
       top: `${y}px`,
-    })
+    });
+
+    if (middlewareData?.hide && !state?.isCallout) {      
+      const { referenceHidden } = middlewareData?.hide
+      Object.assign(attentionEl?.style, {
+        visibility: referenceHidden ? 'hidden' : '',
+      })
+    }
+    
     const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
     const arrowPlacement: string = arrowDirection(placement).split('-')[1]
     
