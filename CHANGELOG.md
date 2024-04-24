@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/warp-ds/core/compare/v1.1.0...v1.1.1) (2024-04-24)
+
+
+### Bug Fixes
+
+* remove autoplacement(), add crossAxis and hide() to attention helpers.ts ([#16](https://github.com/warp-ds/core/issues/16)) ([b472ac4](https://github.com/warp-ds/core/commit/b472ac4dab798f618f349ac126546e86e852f8c7))
+
 # [1.1.0](https://github.com/warp-ds/core/compare/v1.0.2...v1.1.0) (2024-04-16)
 
 
