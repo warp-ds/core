@@ -96,10 +96,6 @@ export type AttentionState = {
   waitForDOM?: () => void
 }
 
-const middlePosition: string = 'calc(50% - 7px)'
-const isDirectionVertical = (name: Directions): boolean =>
-  ([TOP_START, TOP, TOP_END, BOTTOM_START, BOTTOM, BOTTOM_END] as Directions[]).includes(name)
-
 export const arrowDirectionClassname = (dir: Directions) => {
     let direction: Directions
     if (/-/.test(dir)) {
@@ -128,113 +124,103 @@ export const arrowDirectionClassname = (dir: Directions) => {
     });
   }
 
-  function computeCalloutArrow({
-    actualDirection,
-    directionName = BOTTOM,
-    arrowEl,
-  }: AttentionState) {
-    if (!arrowEl) return
-    
-    actualDirection = directionName
-
-  const directionIsVertical: boolean = isDirectionVertical(directionName)
-
-  Object.assign(arrowEl?.style || {}, {
-    left: directionIsVertical ? middlePosition : '',
-    top: !directionIsVertical ? middlePosition : '',
-  })
-  applyArrowStyles(arrowEl, arrowRotation(actualDirection), actualDirection)
-}
-
 export async function useRecompute(state: AttentionState) {
-  if (!state?.isShowing) return // we're not currently showing the element, no reason to recompute
+  if (!state?.isShowing) return; // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
-    await state?.waitForDOM() // wait for DOM to settle before computing
+    await state?.waitForDOM(); // wait for DOM to settle before computing
   }
-  if (state?.isCallout) return computeCalloutArrow(state)
-  
-  if (!state?.targetEl || !state?.attentionEl) return
-  
-  const targetEl: ReferenceElement = state?.targetEl
-  const attentionEl: HTMLElement = state?.attentionEl
-  
-  computePosition(targetEl, attentionEl, {
-    placement: state?.directionName ?? BOTTOM,
-    middleware: [
-      offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0}), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
-      state?.flip && flip({ //when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
-        crossAxis: state?.crossAxis, //checks overflow to trigger a flip. When disabled, it will ignore overflow
-        fallbackPlacements: state?.fallbackPlacements,
-      }),
-      !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
-      hide(), //will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
-    ],
-  }).then(({ x, y, middlewareData, placement }) => {
-    state.actualDirection = placement
-    
-    Object.assign(attentionEl?.style, {
-      left: `${x}px`,
-      top: `${y}px`,
-    });
+  if (!state?.isCallout && !state?.targetEl || !state?.attentionEl) {
+    return;
+  }
 
-    if (middlewareData?.hide && !state?.isCallout) {      
-      const { referenceHidden } = middlewareData?.hide
-      Object.assign(attentionEl?.style, {
-        visibility: referenceHidden ? 'hidden' : '',
-      })
-    }
-    
-    const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl' //checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment 
-    const arrowPlacement: string = arrowDirection(placement).split('-')[1]
-    
-    if (middlewareData?.arrow && state?.arrowEl) {
-      const arrowEl: HTMLElement = state?.arrowEl
-      const { x, y } = middlewareData?.arrow
-      let top = ''
-      let right = ''
-      let bottom = ''
-      let left = ''
+  let targetEl: ReferenceElement = state?.targetEl as ReferenceElement;
+  const attentionEl: HTMLElement = state.attentionEl;
 
-      // calculates the arrow-position depending on if placement has 'start' or 'end':
-      if (arrowPlacement === 'start') {
-        const value =
-          typeof x === 'number'
-            ? `calc(33px - ${arrowEl?.offsetWidth / 2}px)`
-            : ''
-        top =
-          typeof y === 'number'
-            ? `calc(33px -  ${arrowEl?.offsetWidth / 2}px)`
-            : ''
-        right = isRtl ? value : ''
-        left = isRtl ? '' : value
-      } else if (arrowPlacement === 'end') {
-        const value =
-          typeof x === 'number'
-            ? `calc(33px - ${arrowEl?.offsetWidth / 2}px)`
-            : ''
-        right = isRtl ? '' : value
-        left = isRtl ? value : ''
-        bottom =
-          typeof y === 'number'
-            ? `calc(33px - ${arrowEl?.offsetWidth / 2}px)`
-            : ''
-      } else {
-        left = typeof x === 'number' ? `${x}px` : ''
-        top = typeof y === 'number' ? `${y}px` : ''
+  if (state.isCallout && !state?.targetEl) {
+    // Floating-ui needs targetEl to be defined, in order to compute the position of the attentionEl and the position of the attentionEl's arrow. 
+    // For the callout we only need to calculate the arrowPosition. Therefore we create a default targetEl, in case targetEl is undefined and isCallout is true.
+    targetEl = document.createElement('div');
+  }
+
+    computePosition(targetEl, attentionEl, {
+      placement: state?.directionName ?? BOTTOM,
+      middleware: [
+        offset({ mainAxis: state?.distance ?? 8, crossAxis: state?.skidding ?? 0 }), // offers flexibility over how to place the attentionEl towards its targetEl both on the x and y axis (horizontally and vertically).
+        state?.flip && flip({ // when flip is set to true it will move the attentionEl's placement to its opposite side or to the preferred placements if fallbackPlacements has a value
+          crossAxis: state?.crossAxis, // checks overflow to trigger a flip. When disabled, it will ignore overflow
+          fallbackPlacements: state?.fallbackPlacements,
+        }),
+        !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
+        hide(), // will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
+      ],
+    }).then(({ x, y, middlewareData, placement }) => {
+      state.actualDirection = placement;
+      console.log("state.actualDirection: ", state.actualDirection);
+
+      Object.assign(attentionEl.style, {
+        left: `${x}px`,
+        top: `${y}px`,
+      });
+
+      if (middlewareData?.hide && !state?.isCallout) {
+        const { referenceHidden } = middlewareData.hide;
+        Object.assign(attentionEl.style, {
+          visibility: referenceHidden ? 'hidden' : '',
+        });
       }
 
-      Object.assign(arrowEl?.style || {}, {
-        top,
-        right,
-        bottom,
-        left,
-      })
-      applyArrowStyles(arrowEl, arrowRotation(placement), placement)
-    }
-  })
+      const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl'; // checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment
+      const arrowPlacement: string = arrowDirection(placement).split('-')[1];
 
-  return state
+      if (middlewareData?.arrow && state?.arrowEl) {
+        const arrowEl: HTMLElement = state?.arrowEl as HTMLElement;
+        const { x: arrowX, y: arrowY } = middlewareData.arrow;
+        let top = '';
+        let right = '';
+        let bottom = '';
+        let left = '';
+
+        // calculates the arrow-position depending on if placement has 'start' or 'end':
+        if (arrowPlacement === 'start') {
+          const value =
+            typeof arrowX === 'number'
+              ? `calc(33px - ${arrowEl.offsetWidth / 2}px)`
+              : '';
+          top =
+            typeof arrowY === 'number'
+              ? `calc(33px -  ${arrowEl.offsetWidth / 2}px)`
+              : '';
+          right = isRtl ? value : '';
+          left = isRtl ? '' : value;
+        } else if (arrowPlacement === 'end') {
+          const value =
+            typeof arrowX === 'number'
+              ? `calc(33px - ${arrowEl.offsetWidth / 2}px)`
+              : '';
+          right = isRtl ? '' : value;
+          left = isRtl ? value : '';
+          bottom =
+            typeof arrowY === 'number'
+              ? `calc(33px - ${arrowEl.offsetWidth / 2}px)`
+              : '';
+        } else {
+          left = typeof arrowX === 'number' ? `${arrowX}px` : '';
+          top = typeof arrowY === 'number' ? `${arrowY}px` : '';
+        }
+
+        Object.assign(arrowEl.style, {
+          top,
+          right,
+          bottom,
+          left,
+        });
+        applyArrowStyles(arrowEl, arrowRotation(placement), placement);
+      }
+    });
+
+  return state;
 }
+
 
 export const autoUpdatePosition = (state: AttentionState) => {
   // computePosition is only run once, so we need to wrap autoUpdate() around useRecompute() in order to recompute the attentionEl's position
