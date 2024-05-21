@@ -124,24 +124,16 @@ export const arrowDirectionClassname = (dir: Directions) => {
     });
   }
 
-export async function useRecompute(state: AttentionState) {
-  if (!state?.isShowing) return; // we're not currently showing the element, no reason to recompute
-  if (state?.waitForDOM) {
-    await state?.waitForDOM(); // wait for DOM to settle before computing
-  }
-  if (!state?.isCallout && !state?.targetEl || !state?.attentionEl) {
-    return;
-  }
-
-  let targetEl: ReferenceElement = state?.targetEl as ReferenceElement;
-  const attentionEl: HTMLElement = state.attentionEl;
-
-  if (state.isCallout && !state?.targetEl) {
-    // Floating-ui needs targetEl to be defined, in order to compute the position of the attentionEl and the position of the attentionEl's arrow. 
-    // For the callout we only need to calculate the arrowPosition. Therefore we create a default targetEl, in case targetEl is undefined and isCallout is true.
-    targetEl = document.createElement('div');
-  }
-
+  export async function useRecompute(state: AttentionState) {
+    if (!state?.isShowing) return; // we're not currently showing the element, no reason to recompute
+    if (state?.waitForDOM) {
+      await state?.waitForDOM(); // wait for DOM to settle before computing
+    }
+    if (!state?.targetEl || !state?.attentionEl) return;
+  
+    let targetEl: ReferenceElement = state?.targetEl;
+    const attentionEl: HTMLElement = state.attentionEl;
+  
     computePosition(targetEl, attentionEl, {
       placement: state?.directionName ?? BOTTOM,
       middleware: [
@@ -155,23 +147,22 @@ export async function useRecompute(state: AttentionState) {
       ],
     }).then(({ x, y, middlewareData, placement }) => {
       state.actualDirection = placement;
-      console.log("state.actualDirection: ", state.actualDirection);
-
+  
       Object.assign(attentionEl.style, {
         left: `${x}px`,
         top: `${y}px`,
       });
-
+  
       if (middlewareData?.hide && !state?.isCallout) {
         const { referenceHidden } = middlewareData.hide;
         Object.assign(attentionEl.style, {
           visibility: referenceHidden ? 'hidden' : '',
         });
       }
-
+  
       const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl'; // checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment
       const arrowPlacement: string = arrowDirection(placement).split('-')[1];
-
+  
       if (middlewareData?.arrow && state?.arrowEl) {
         const arrowEl: HTMLElement = state?.arrowEl as HTMLElement;
         const { x: arrowX, y: arrowY } = middlewareData.arrow;
@@ -179,7 +170,7 @@ export async function useRecompute(state: AttentionState) {
         let right = '';
         let bottom = '';
         let left = '';
-
+  
         // calculates the arrow-position depending on if placement has 'start' or 'end':
         if (arrowPlacement === 'start') {
           const value =
@@ -207,7 +198,7 @@ export async function useRecompute(state: AttentionState) {
           left = typeof arrowX === 'number' ? `${arrowX}px` : '';
           top = typeof arrowY === 'number' ? `${arrowY}px` : '';
         }
-
+  
         Object.assign(arrowEl.style, {
           top,
           right,
@@ -217,9 +208,10 @@ export async function useRecompute(state: AttentionState) {
         applyArrowStyles(arrowEl, arrowRotation(placement), placement);
       }
     });
-
-  return state;
-}
+  
+    return state;
+  }
+  
 
 
 export const autoUpdatePosition = (state: AttentionState) => {
