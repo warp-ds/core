@@ -218,7 +218,7 @@ export const autoUpdatePosition = (state: AttentionState) => {
   // computePosition is only run once, so we need to wrap autoUpdate() around useRecompute() in order to recompute the attentionEl's position
   // autoUpdate adds event listeners that are triggered on resize and on scroll and will keep calling the useRecompute(). 
   // autoUpdate returns a cleanup() function that removes the event listeners.
-  if (!state?.targetEl || !state?.attentionEl) return 
+  if (!state?.targetEl || !state?.attentionEl || state?.isCallout) return 
   return autoUpdate(state?.targetEl, state?.attentionEl, () => {
     useRecompute(state)
   })
