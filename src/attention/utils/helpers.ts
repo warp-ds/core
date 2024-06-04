@@ -147,7 +147,7 @@ export const arrowDirectionClassname = (dir: Directions) => {
       ],
     }).then(({ x, y, middlewareData, placement }) => {
       state.actualDirection = placement;
-  
+
       Object.assign(attentionEl.style, {
         left: `${x}px`,
         top: `${y}px`,
@@ -175,24 +175,24 @@ export const arrowDirectionClassname = (dir: Directions) => {
         if (arrowPlacement === 'start') {
           const value =
             typeof arrowX === 'number'
-              ? `calc(33px - ${arrowEl.offsetWidth / 2}px)`
+              ? `calc(24px - ${arrowEl.offsetWidth / 2}px)`
               : '';
           top =
             typeof arrowY === 'number'
-              ? `calc(33px -  ${arrowEl.offsetWidth / 2}px)`
+              ? `calc(24px -  ${arrowEl.offsetWidth / 2}px)`
               : '';
           right = isRtl ? value : '';
           left = isRtl ? '' : value;
         } else if (arrowPlacement === 'end') {
           const value =
             typeof arrowX === 'number'
-              ? `calc(33px - ${arrowEl.offsetWidth / 2}px)`
+              ? `calc(24px - ${arrowEl.offsetWidth / 2}px)`
               : '';
           right = isRtl ? '' : value;
           left = isRtl ? value : '';
           bottom =
             typeof arrowY === 'number'
-              ? `calc(33px - ${arrowEl.offsetWidth / 2}px)`
+              ? `calc(24px - ${arrowEl.offsetWidth / 2}px)`
               : '';
         } else {
           left = typeof arrowX === 'number' ? `${arrowX}px` : '';
