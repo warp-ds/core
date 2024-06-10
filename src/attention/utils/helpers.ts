@@ -148,10 +148,14 @@ export const arrowDirectionClassname = (dir: Directions) => {
     }).then(({ x, y, middlewareData, placement }) => {
       state.actualDirection = placement;
 
-      Object.assign(attentionEl.style, {
-        left: `${x}px`,
-        top: `${y}px`,
-      });
+      // We only want floating-ui to calculate the callout's arrow position and not the attention element's position, since the targetEl can be undefined if isCallout is true.
+      // Therefore, we only add this style to the attentionEl when isCallout is false.
+      if (!state?.isCallout) {
+        Object.assign(attentionEl.style, {
+          left: `${x}px`,
+          top: `${y}px`,
+        });
+      }
   
       if (middlewareData?.hide && !state?.isCallout) {
         const { referenceHidden } = middlewareData.hide;
