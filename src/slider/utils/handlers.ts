@@ -1,11 +1,4 @@
-import {
-  validKeyCodes,
-  validKeys,
-  eventOptions,
-  clamp,
-  roundDecimals,
-  ElementType,
-} from './helpers.js';
+import { validKeyCodes, validKeys, eventOptions, clamp, roundDecimals, ElementType } from './helpers.js';
 
 type ClickEvent = TouchEvent | MouseEvent;
 
@@ -33,9 +26,8 @@ interface SliderState {
   thumbEl: HTMLDivElement | null;
 }
 
-export function createHandlers({ props, sliderState }: { props: SliderProps; sliderState: SliderState; }) {
-  const clampedChange = (n: number) =>
-    clamp(n, { max: props.max, min: props.min });
+export function createHandlers({ props, sliderState }: { props: SliderProps; sliderState: SliderState }) {
+  const clampedChange = (n: number) => clamp(n, { max: props.max, min: props.min });
 
   function getCoordinates(e: ClickEvent) {
     const { left: offsetLeft, width: trackWidth } = sliderState.dimensions;
@@ -45,11 +37,9 @@ export function createHandlers({ props, sliderState }: { props: SliderProps; sli
     return { value };
   }
 
-  const getThumbPosition = () =>
-    ((sliderState.position - props.min) / (props.max - props.min)) * 100;
+  const getThumbPosition = () => ((sliderState.position - props.min) / (props.max - props.min)) * 100;
 
-  const getThumbTransform = () =>
-    (getThumbPosition() / 100) * sliderState.dimensions.width;
+  const getThumbTransform = () => (getThumbPosition() / 100) * sliderState.dimensions.width;
 
   const getShiftedChange = (n: number) => {
     const r = 1.0 / sliderState.step;
@@ -58,8 +48,8 @@ export function createHandlers({ props, sliderState }: { props: SliderProps; sli
 
   const keydownRepeat = {
     counter: 0,
-    repeatsBeforeAcceleration: 3
-  }
+    repeatsBeforeAcceleration: 3,
+  };
 
   function handleKeyDown(e: KeyboardEvent) {
     const key = e.key as ElementType<typeof validKeyCodes>;
@@ -72,15 +62,15 @@ export function createHandlers({ props, sliderState }: { props: SliderProps; sli
       case validKeys.right:
       case validKeys.up:
       case validKeys.down: {
-        const direction = (key === validKeys.right || key === validKeys.up) ? 1 : -1;
+        const direction = key === validKeys.right || key === validKeys.up ? 1 : -1;
         let stepsToMove = sliderState.step;
         if (!props.preventAcceleration) {
           if (e.repeat) {
             keydownRepeat.counter++;
-            const acceleratedStepPercentage = Math.min((keydownRepeat.counter - keydownRepeat.repeatsBeforeAcceleration) / 100, .2);
+            const acceleratedStepPercentage = Math.min((keydownRepeat.counter - keydownRepeat.repeatsBeforeAcceleration) / 100, 0.2);
             stepsToMove = Math.max(
-                sliderState.step,
-                Math.ceil((direction > 0 ? props.max - sliderState.val : sliderState.val - props.min) * acceleratedStepPercentage)
+              sliderState.step,
+              Math.ceil((direction > 0 ? props.max - sliderState.val : sliderState.val - props.min) * acceleratedStepPercentage),
             );
           } else {
             keydownRepeat.counter = 0;
@@ -102,15 +92,9 @@ export function createHandlers({ props, sliderState }: { props: SliderProps; sli
         const maxStepMultiplier = 50;
         sliderState.position = clampedChange(
           sliderState.val +
-          direction *
-          sliderState.step *
-          Math.max(
-            minStepMultiplier,
-            Math.min(
-              maxStepMultiplier,
-              Math.ceil((props.max - props.min) / 10 / sliderState.step)
-            )
-          )
+            direction *
+              sliderState.step *
+              Math.max(minStepMultiplier, Math.min(maxStepMultiplier, Math.ceil((props.max - props.min) / 10 / sliderState.step))),
         );
         break;
       }

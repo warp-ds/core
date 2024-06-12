@@ -9,14 +9,14 @@
   },
   "typesVersions": {
     "*": {
+      "attention": [
+        "./dist/attention/index.d.ts"
+      ],
       "breadcrumbs": [
         "./dist/breadcrumbs/index.d.ts"
       ],
       "slider": [
         "./dist/slider/index.d.ts"
-      ],
-      "attention": [
-        "./dist/attention/index.d.ts"
       ]
     }
   },
@@ -27,19 +27,26 @@
     "@floating-ui/dom": "1.6.3"
   },
   "scripts": {
-    "commit": "cz",
     "build": "tsc",
+    "commit": "cz",
+    "lint:check": "eslint . --ext ts --ignore-path .gitignore",
+    "lint": "eslint . --fix --ext ts --ignore-path .gitignore",
     "test": "echo \"no tests\""
   },
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
-    "typescript": "^4.7.4",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "@warp-ds/eslint-config": "1.0.5",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "8.57.0",
+    "prettier": "3.2.5",
     "semantic-release": "^22.0.7",
-    "cz-conventional-changelog": "^3.3.0"
+    "typescript": "^4.7.4"
   },
   "publishConfig": {
     "access": "public"

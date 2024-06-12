@@ -1,25 +1,19 @@
-import { Dimensions } from "./handlers.js";
+import { Dimensions } from './handlers.js';
 
 type UpdateDimensions = ({ left, width }: Dimensions) => void;
 
-export type ElementType<T extends ReadonlyArray<unknown>> =
-  T extends ReadonlyArray<infer ElementType> ? ElementType : never;
+export type ElementType<T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<infer ElementType> ? ElementType : never;
 
 export const useDimensions = () => {
   let observer: ResizeObserver;
 
   // we use boundingClient because other observer attributes don't calculate X offset in a useful way
-  const useOnResize =
-    (updateDimensions: UpdateDimensions) =>
-    (entries: ResizeObserverEntry[]) => {
-      const { left, width: w } = entries[0].target.getBoundingClientRect();
-      updateDimensions({ left, width: w - 24 }); // so the thumb can't run off the track to the right
-    };
+  const useOnResize = (updateDimensions: UpdateDimensions) => (entries: ResizeObserverEntry[]) => {
+    const { left, width: w } = entries[0].target.getBoundingClientRect();
+    updateDimensions({ left, width: w - 24 }); // so the thumb can't run off the track to the right
+  };
 
-  const mountedHook = (
-    sliderLineEl: HTMLDivElement,
-    updateDimensions: UpdateDimensions
-  ) => {
+  const mountedHook = (sliderLineEl: HTMLDivElement, updateDimensions: UpdateDimensions) => {
     updateDimensions(sliderLineEl.getBoundingClientRect());
     observer = new ResizeObserver(useOnResize(updateDimensions));
     observer.observe(sliderLineEl);
@@ -32,14 +26,14 @@ export const useDimensions = () => {
 };
 
 export const validKeys = Object.freeze({
-  up: "ArrowUp",
-  down: "ArrowDown",
-  left: "ArrowLeft",
-  right: "ArrowRight",
-  end: "End",
-  home: "Home",
-  pageup: "PageUp",
-  pagedown: "PageDown",
+  up: 'ArrowUp',
+  down: 'ArrowDown',
+  left: 'ArrowLeft',
+  right: 'ArrowRight',
+  end: 'End',
+  home: 'Home',
+  pageup: 'PageUp',
+  pagedown: 'PageDown',
 });
 
 export const validKeyCodes = Object.values(validKeys);
@@ -52,7 +46,5 @@ export function roundDecimals(n: number, decimals = 2) {
 }
 
 const isNumber = (e: string) => Number.isFinite(parseFloat(e));
-export const clamp = (
-  v: string | number,
-  { min, max }: { min: number; max: number }
-) => (isNumber(v as string) ? Math.min(Math.max(Number(v), min), max) : min);
+export const clamp = (v: string | number, { min, max }: { min: number; max: number }) =>
+  isNumber(v as string) ? Math.min(Math.max(Number(v), min), max) : min;
