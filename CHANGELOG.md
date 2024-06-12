@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/warp-ds/core/compare/v1.1.1...v1.1.2) (2024-06-12)
+
+
+### Bug Fixes
+
+* add start end suffix for callout and add eslint-config ([#17](https://github.com/warp-ds/core/issues/17)) ([605fbc6](https://github.com/warp-ds/core/commit/605fbc6bb563acb4b7141ba77b7b5d86b378311a))
+
 ## [1.1.1](https://github.com/warp-ds/core/compare/v1.1.0...v1.1.1) (2024-04-24)
 
 
