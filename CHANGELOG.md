@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/warp-ds/core/compare/v1.1.2...v1.1.3) (2024-06-14)
+
+
+### Bug Fixes
+
+* slider acceleration for react ([#18](https://github.com/warp-ds/core/issues/18)) ([c42585f](https://github.com/warp-ds/core/commit/c42585fe953abb109f92bcf89c47582883b4bf2a))
+
 ## [1.1.2](https://github.com/warp-ds/core/compare/v1.1.1...v1.1.2) (2024-06-12)
 
 
