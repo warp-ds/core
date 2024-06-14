@@ -26,6 +26,11 @@ interface SliderState {
   thumbEl: HTMLDivElement | null;
 }
 
+let keydownRepeat = {
+  counter: 0,
+  repeatsBeforeAcceleration: 3,
+};
+
 export function createHandlers({ props, sliderState }: { props: SliderProps; sliderState: SliderState }) {
   const clampedChange = (n: number) => clamp(n, { max: props.max, min: props.min });
 
@@ -44,11 +49,6 @@ export function createHandlers({ props, sliderState }: { props: SliderProps; sli
   const getShiftedChange = (n: number) => {
     const r = 1.0 / sliderState.step;
     return Math.floor(n * r) / r;
-  };
-
-  const keydownRepeat = {
-    counter: 0,
-    repeatsBeforeAcceleration: 3,
   };
 
   function handleKeyDown(e: KeyboardEvent) {
