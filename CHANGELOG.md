@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/warp-ds/core/compare/v1.1.3...v1.1.4) (2024-07-04)
+
+
+### Bug Fixes
+
+* bump pnpm/action-setup@v2 to v4 and bump to version 9 in release.yml ([48a5f68](https://github.com/warp-ds/core/commit/48a5f68fbe975b35c1b6fa148a9ea58018de40d6))
+
 ## [1.1.3](https://github.com/warp-ds/core/compare/v1.1.2...v1.1.3) (2024-06-14)
 
 
