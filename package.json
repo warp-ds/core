@@ -24,7 +24,7 @@
     "dist"
   ],
   "peerDependencies": {
-    "@floating-ui/dom": "1.6.7"
+    "@floating-ui/dom": "1.6.x"
   },
   "scripts": {
     "build": "tsc",
