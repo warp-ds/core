@@ -1,3 +1,10 @@
+## [1.1.5](https://github.com/warp-ds/core/compare/v1.1.4...v1.1.5) (2024-07-05)
+
+
+### Bug Fixes
+
+* update @floating-ui/dom peerDep ([#20](https://github.com/warp-ds/core/issues/20)) ([01f8077](https://github.com/warp-ds/core/commit/01f807776dc30a00e484e2c3fc2dd49885cca477))
+
 ## [1.1.4](https://github.com/warp-ds/core/compare/v1.1.3...v1.1.4) (2024-07-04)
 
 
