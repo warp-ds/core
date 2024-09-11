@@ -1,4 +1,4 @@
-import { computePosition, flip, offset, arrow, autoUpdate, ReferenceElement, hide } from '@floating-ui/dom';
+import { computePosition, flip, offset, arrow, autoUpdate, ReferenceElement, hide, shift } from '@floating-ui/dom';
 
 export type Directions =
   | 'top'
@@ -138,6 +138,7 @@ export async function useRecompute(state: AttentionState) {
           fallbackPlacements: state?.fallbackPlacements,
         }),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
+      state?.flip && shift({ crossAxis: true }),
       hide(), // will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
     ],
   }).then(({ x, y, middlewareData, placement }) => {
@@ -159,38 +160,18 @@ export async function useRecompute(state: AttentionState) {
       });
     }
 
-    const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl'; // checks whether the text direction of the attentionEl is right-to-left. Helps to calculate the position of the arrowEl and ensure proper alignment
-    const arrowPlacement: string = arrowDirection(placement).split('-')[1];
-
     if (middlewareData?.arrow && state?.arrowEl) {
       const arrowEl: HTMLElement = state?.arrowEl as HTMLElement;
       const { x: arrowX, y: arrowY } = middlewareData.arrow;
-      let top = '';
-      let right = '';
-      let bottom = '';
-      let left = '';
+      const { x: shiftX } = middlewareData.shift || {}; // Get the shift value if it exists
 
-      // calculates the arrow-position depending on if placement has 'start' or 'end':
-      if (arrowPlacement === 'start') {
-        const value = typeof arrowX === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
-        top = typeof arrowY === 'number' ? `calc(24px -  ${arrowEl.offsetWidth / 2}px)` : '';
-        right = isRtl ? value : '';
-        left = isRtl ? '' : value;
-      } else if (arrowPlacement === 'end') {
-        const value = typeof arrowX === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
-        right = isRtl ? '' : value;
-        left = isRtl ? value : '';
-        bottom = typeof arrowY === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
-      } else {
-        left = typeof arrowX === 'number' ? `${arrowX}px` : '';
-        top = typeof arrowY === 'number' ? `${arrowY}px` : '';
-      }
+      // Adjust the arrow based on the cross-axis shift
+      let left = typeof arrowX === 'number' ? `${arrowX - (shiftX || 0)}px` : '';
+      let top = typeof arrowY === 'number' ? `${arrowY}px` : '';
 
       Object.assign(arrowEl.style, {
-        top,
-        right,
-        bottom,
         left,
+        top,
       });
       applyArrowStyles(arrowEl, arrowRotation(placement), placement);
     }
