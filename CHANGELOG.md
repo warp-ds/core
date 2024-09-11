@@ -1,3 +1,10 @@
+## [1.1.6](https://github.com/warp-ds/core/compare/v1.1.5...v1.1.6) (2024-09-11)
+
+
+### Bug Fixes
+
+* **attention:** add shift() to check for cross-axis ([#21](https://github.com/warp-ds/core/issues/21)) ([f11690b](https://github.com/warp-ds/core/commit/f11690b0ee0d689088b0ff5837053e7711e37e18))
+
 ## [1.1.5](https://github.com/warp-ds/core/compare/v1.1.4...v1.1.5) (2024-07-05)
 
 
