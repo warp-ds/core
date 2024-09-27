@@ -138,7 +138,7 @@ export async function useRecompute(state: AttentionState) {
           fallbackPlacements: state?.fallbackPlacements,
         }),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
-      state?.flip && shift({ crossAxis: true }),
+      state?.flip && shift((shiftState) => ({ crossAxis: true, padding: shiftState.rects.reference.width * 0.1 })),
       hide(), // will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
     ],
   }).then(({ x, y, middlewareData, placement }) => {
