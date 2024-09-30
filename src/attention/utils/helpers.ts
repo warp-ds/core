@@ -1,4 +1,4 @@
-import { computePosition, flip, offset, arrow, autoUpdate, ReferenceElement, hide, shift } from '@floating-ui/dom';
+import { computePosition, flip, offset, arrow, autoUpdate, ReferenceElement, hide, shift, size } from '@floating-ui/dom';
 
 export type Directions =
   | 'top'
@@ -138,8 +138,17 @@ export async function useRecompute(state: AttentionState) {
           fallbackPlacements: state?.fallbackPlacements,
         }),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
-      state?.flip && shift((shiftState) => ({ crossAxis: true, padding: shiftState.rects.reference.width * 0.1 })),
+      state?.flip && shift({ crossAxis: true }), // shifts the attentionEl to make sure that it stays in view
       hide(), // will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
+      size({
+        apply({rects}) {
+          // Apply equal padding to the left and right sides of the attentionEl to prevent it from overflowing the viewport on smaller screens.
+          Object.assign(attentionEl.style, {
+            paddingRight: `${rects.reference.width * 0.15}px`,
+            paddingLeft: `${rects.reference.width * 0.15}px`
+          });
+        },
+      }),
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement;
