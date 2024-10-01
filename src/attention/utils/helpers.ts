@@ -141,11 +141,11 @@ export async function useRecompute(state: AttentionState) {
       state?.flip && shift({ crossAxis: true }), // shifts the attentionEl to make sure that it stays in view
       hide(), // will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
       size({
-        apply({rects}) {
+        apply() {
           // Apply equal padding to the left and right sides of the attentionEl to prevent it from overflowing the viewport on smaller screens.
           Object.assign(attentionEl.style, {
-            paddingRight: `${rects.reference.width * 0.15}px`,
-            paddingLeft: `${rects.reference.width * 0.15}px`
+            paddingRight: '8px',
+            paddingLeft: '8px',
           });
         },
       }),
@@ -168,20 +168,51 @@ export async function useRecompute(state: AttentionState) {
         visibility: referenceHidden ? 'hidden' : '',
       });
     }
+    const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl'; // Checks RTL for proper arrow alignment
+    const arrowPlacement: string = arrowDirection(placement).split('-')[1];
 
     if (middlewareData?.arrow && state?.arrowEl) {
       const arrowEl: HTMLElement = state?.arrowEl as HTMLElement;
       const { x: arrowX, y: arrowY } = middlewareData.arrow;
+
+      let top = '';
+      let right = '';
+      let bottom = '';
+      let left = '';
+
+      // Check for shift adjustments
       const { x: shiftX } = middlewareData.shift || {}; // Get the shift value if it exists
 
-      // Adjust the arrow based on the cross-axis shift
-      let left = typeof arrowX === 'number' ? `${arrowX - (shiftX || 0)}px` : '';
-      let top = typeof arrowY === 'number' ? `${arrowY}px` : '';
+      // Calculate position for 'start' and 'end'
+      if (arrowPlacement === 'start') {
+        const value = typeof arrowX === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
+        top = typeof arrowY === 'number' ? `calc(24px -  ${arrowEl.offsetWidth / 2}px)` : '';
+        right = isRtl ? value : '';
+        left = isRtl ? '' : value;
+      } else if (arrowPlacement === 'end') {
+        const value = typeof arrowX === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
+        right = isRtl ? '' : value;
+        left = isRtl ? value : '';
+        bottom = typeof arrowY === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
+      } else {
+        // Default placement (with no 'start' or 'end')
+        left = typeof arrowX === 'number' ? `${arrowX}px` : '';
+        top = typeof arrowY === 'number' ? `${arrowY}px` : '';
+      }
 
+      // Adjust for cross-axis shift
+      if (typeof shiftX === 'number') {
+        left = typeof arrowX === 'number' ? `${arrowX - shiftX}px` : left;
+      }
+
+      // Apply the calculated position
       Object.assign(arrowEl.style, {
-        left,
         top,
+        right,
+        bottom,
+        left,
       });
+
       applyArrowStyles(arrowEl, arrowRotation(placement), placement);
     }
   });
