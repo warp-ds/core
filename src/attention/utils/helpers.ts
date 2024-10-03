@@ -117,6 +117,9 @@ const applyArrowStyles = (arrowEl: HTMLElement, arrowRotation: number, dir: Dire
   });
 };
 
+const ELEMENT_PADDING = 8;
+const ARROW_OFFSET = 24;
+
 export async function useRecompute(state: AttentionState) {
   if (!state?.isShowing) return; // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
@@ -144,8 +147,8 @@ export async function useRecompute(state: AttentionState) {
         apply() {
           // Apply equal padding to the left and right sides of the attentionEl to prevent it from overflowing the viewport on smaller screens.
           Object.assign(attentionEl.style, {
-            paddingRight: '8px',
-            paddingLeft: '8px',
+            paddingRight: `${ELEMENT_PADDING}px`,
+            paddingLeft: `${ELEMENT_PADDING}px`,
           });
         },
       }),
@@ -184,15 +187,15 @@ export async function useRecompute(state: AttentionState) {
 
       // Adjust based on 'start' or 'end' placements
       if (arrowPlacement === 'start') {
-        const value = typeof arrowX === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
-        top = typeof arrowY === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
+        const value = typeof arrowX === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+        top = typeof arrowY === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
         right = isRtl ? value : '';
         left = isRtl ? '' : value;
       } else if (arrowPlacement === 'end') {
-        const value = typeof arrowX === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
+        const value = typeof arrowX === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
         right = isRtl ? '' : value;
         left = isRtl ? value : '';
-        bottom = typeof arrowY === 'number' ? `calc(24px - ${arrowEl.offsetWidth / 2}px)` : '';
+        bottom = typeof arrowY === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
       } else {
         // Default positioning with no 'start' or 'end'
         left = typeof arrowX === 'number' ? `${arrowX}px` : '';
