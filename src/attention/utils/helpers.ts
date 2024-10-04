@@ -1,4 +1,4 @@
-import { computePosition, flip, offset, arrow, autoUpdate, ReferenceElement, hide, shift } from '@floating-ui/dom';
+import { computePosition, flip, offset, arrow, autoUpdate, ReferenceElement, hide, shift, size } from '@floating-ui/dom';
 
 export type Directions =
   | 'top'
@@ -117,6 +117,9 @@ const applyArrowStyles = (arrowEl: HTMLElement, arrowRotation: number, dir: Dire
   });
 };
 
+const ELEMENT_PADDING = 8;
+const ARROW_OFFSET = 24;
+
 export async function useRecompute(state: AttentionState) {
   if (!state?.isShowing) return; // we're not currently showing the element, no reason to recompute
   if (state?.waitForDOM) {
@@ -138,8 +141,17 @@ export async function useRecompute(state: AttentionState) {
           fallbackPlacements: state?.fallbackPlacements,
         }),
       !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
-      state?.flip && shift({ crossAxis: true }),
+      state?.flip && shift({ crossAxis: true }), // shifts the attentionEl to make sure that it stays in view
       hide(), // will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
+      size({
+        apply() {
+          // Apply equal padding to the left and right sides of the attentionEl to prevent it from overflowing the viewport on smaller screens.
+          Object.assign(attentionEl.style, {
+            paddingRight: `${ELEMENT_PADDING}px`,
+            paddingLeft: `${ELEMENT_PADDING}px`,
+          });
+        },
+      }),
     ],
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement;
@@ -153,6 +165,7 @@ export async function useRecompute(state: AttentionState) {
       });
     }
 
+    // Handle visibility based on hide middleware
     if (middlewareData?.hide && !state?.isCallout) {
       const { referenceHidden } = middlewareData.hide;
       Object.assign(attentionEl.style, {
@@ -160,19 +173,50 @@ export async function useRecompute(state: AttentionState) {
       });
     }
 
+    // Arrow position adjustment
     if (middlewareData?.arrow && state?.arrowEl) {
       const arrowEl: HTMLElement = state?.arrowEl as HTMLElement;
       const { x: arrowX, y: arrowY } = middlewareData.arrow;
-      const { x: shiftX } = middlewareData.shift || {}; // Get the shift value if it exists
+      const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl'; // Checks RTL for proper arrow alignment
+      const arrowPlacement: string = arrowDirection(placement).split('-')[1];
 
-      // Adjust the arrow based on the cross-axis shift
-      let left = typeof arrowX === 'number' ? `${arrowX - (shiftX || 0)}px` : '';
-      let top = typeof arrowY === 'number' ? `${arrowY}px` : '';
+      let top = '',
+        right = '',
+        bottom = '',
+        left = '';
 
+      // Adjust based on 'start' or 'end' placements
+      if (arrowPlacement === 'start') {
+        const value = typeof arrowX === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+        top = typeof arrowY === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+        right = isRtl ? value : '';
+        left = isRtl ? '' : value;
+      } else if (arrowPlacement === 'end') {
+        const value = typeof arrowX === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+        right = isRtl ? '' : value;
+        left = isRtl ? value : '';
+        bottom = typeof arrowY === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+      } else {
+        // Default positioning with no 'start' or 'end'
+        left = typeof arrowX === 'number' ? `${arrowX}px` : '';
+        top = typeof arrowY === 'number' ? `${arrowY}px` : '';
+      }
+
+      // Adjust for shift if applied
+      const { x: shiftX } = middlewareData.shift || {};
+      if (typeof shiftX === 'number') {
+        left = typeof arrowX === 'number' ? `${arrowX - shiftX}px` : left;
+      }
+
+      // Apply the arrow styles
       Object.assign(arrowEl.style, {
-        left,
         top,
+        right,
+        bottom,
+        left,
       });
+
+      // Apply arrow rotation styles
       applyArrowStyles(arrowEl, arrowRotation(placement), placement);
     }
   });
