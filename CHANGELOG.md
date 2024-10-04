@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/warp-ds/core/compare/v1.1.6...v1.1.7) (2024-10-04)
+
+
+### Bug Fixes
+
+* add default padding to attention el and fix arrow positioning ([#22](https://github.com/warp-ds/core/issues/22)) ([7894642](https://github.com/warp-ds/core/commit/7894642cea7257f0c157a97ce5f606022a7febb7))
+
 ## [1.1.6](https://github.com/warp-ds/core/compare/v1.1.5...v1.1.6) (2024-09-11)
 
 
