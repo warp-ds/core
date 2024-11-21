@@ -140,8 +140,8 @@ export async function useRecompute(state: AttentionState) {
           crossAxis: state?.crossAxis, // checks overflow to trigger a flip. When disabled, it will ignore overflow
           fallbackPlacements: state?.fallbackPlacements,
         }),
-      !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
       state?.flip && shift({ crossAxis: true }), // shifts the attentionEl to make sure that it stays in view
+      !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
       hide(), // will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
       size({
         apply() {
@@ -179,33 +179,31 @@ export async function useRecompute(state: AttentionState) {
       const { x: arrowX, y: arrowY } = middlewareData.arrow;
       const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl'; // Checks RTL for proper arrow alignment
       const arrowPlacement: string = arrowDirection(placement).split('-')[1];
+      const isStart = arrowPlacement === 'start';
+      const isEnd = arrowPlacement === 'end';
 
-      let top = '',
-        right = '',
-        bottom = '',
-        left = '';
+      let top = '';
+      let right = '';
+      let bottom = '';
+      let left = '';
 
       // Adjust based on 'start' or 'end' placements
-      if (arrowPlacement === 'start') {
-        const value = typeof arrowX === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
-        top = typeof arrowY === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
-        right = isRtl ? value : '';
-        left = isRtl ? '' : value;
-      } else if (arrowPlacement === 'end') {
-        const value = typeof arrowX === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
-        right = isRtl ? '' : value;
-        left = isRtl ? value : '';
-        bottom = typeof arrowY === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+      if (isStart || isEnd) {
+        const offsetValue = `${ARROW_OFFSET}px`;
+
+        // Calculate positions based on RTL and arrowX/arrowY
+        if (isStart) {
+          left = isRtl ? '' : `calc(${offsetValue} - ${arrowEl.offsetWidth / 2}px)`;
+          right = isRtl ? `calc(${offsetValue} - ${arrowEl.offsetWidth / 2}px)` : '';
+        } else if (isEnd) {
+          left = isRtl ? `calc(${offsetValue} - ${arrowEl.offsetWidth / 2}px)` : '';
+          right = isRtl ? '' : `calc(${offsetValue} - ${arrowEl.offsetWidth / 2}px)`;
+        }
+        top = typeof arrowY === 'number' ? `${arrowY}px` : top;
       } else {
         // Default positioning with no 'start' or 'end'
         left = typeof arrowX === 'number' ? `${arrowX}px` : '';
         top = typeof arrowY === 'number' ? `${arrowY}px` : '';
-      }
-
-      // Adjust for shift if applied
-      const { x: shiftX } = middlewareData.shift || {};
-      if (typeof shiftX === 'number') {
-        left = typeof arrowX === 'number' ? `${arrowX - shiftX}px` : left;
       }
 
       // Apply the arrow styles
