@@ -179,27 +179,23 @@ export async function useRecompute(state: AttentionState) {
       const { x: arrowX, y: arrowY } = middlewareData.arrow;
       const isRtl = window.getComputedStyle(attentionEl).direction === 'rtl'; // Checks RTL for proper arrow alignment
       const arrowPlacement: string = arrowDirection(placement).split('-')[1];
-      const isStart = arrowPlacement === 'start';
-      const isEnd = arrowPlacement === 'end';
 
-      let top = '';
-      let right = '';
-      let bottom = '';
-      let left = '';
+      let top = '',
+        right = '',
+        bottom = '',
+        left = '';
 
       // Adjust based on 'start' or 'end' placements
-      if (isStart || isEnd) {
-        const offsetValue = `${ARROW_OFFSET}px`;
-
-        // Calculate positions based on RTL and arrowX/arrowY
-        if (isStart) {
-          left = isRtl ? '' : `calc(${offsetValue} - ${arrowEl.offsetWidth / 2}px)`;
-          right = isRtl ? `calc(${offsetValue} - ${arrowEl.offsetWidth / 2}px)` : '';
-        } else if (isEnd) {
-          left = isRtl ? `calc(${offsetValue} - ${arrowEl.offsetWidth / 2}px)` : '';
-          right = isRtl ? '' : `calc(${offsetValue} - ${arrowEl.offsetWidth / 2}px)`;
-        }
-        top = typeof arrowY === 'number' ? `${arrowY}px` : top;
+      if (arrowPlacement === 'start') {
+        const value = typeof arrowX === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+        top = typeof arrowY === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+        right = isRtl ? value : '';
+        left = isRtl ? '' : value;
+      } else if (arrowPlacement === 'end') {
+        const value = typeof arrowX === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
+        right = isRtl ? '' : value;
+        left = isRtl ? value : '';
+        bottom = typeof arrowY === 'number' ? `calc(${ARROW_OFFSET}px - ${arrowEl.offsetWidth / 2}px)` : '';
       } else {
         // Default positioning with no 'start' or 'end'
         left = typeof arrowX === 'number' ? `${arrowX}px` : '';
