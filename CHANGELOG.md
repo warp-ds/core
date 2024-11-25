@@ -1,3 +1,10 @@
+## [1.1.8](https://github.com/warp-ds/core/compare/v1.1.7...v1.1.8) (2024-11-25)
+
+
+### Bug Fixes
+
+* adjust arrow position misalignment when flip is activated ([#23](https://github.com/warp-ds/core/issues/23)) ([8a47a63](https://github.com/warp-ds/core/commit/8a47a63a47dfa43dd11247aaf59e0c47dc84d432))
+
 ## [1.1.7](https://github.com/warp-ds/core/compare/v1.1.6...v1.1.7) (2024-10-04)
 
 
