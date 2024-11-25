@@ -140,8 +140,8 @@ export async function useRecompute(state: AttentionState) {
           crossAxis: state?.crossAxis, // checks overflow to trigger a flip. When disabled, it will ignore overflow
           fallbackPlacements: state?.fallbackPlacements,
         }),
-      !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
       state?.flip && shift({ crossAxis: true }), // shifts the attentionEl to make sure that it stays in view
+      !state?.noArrow && state?.arrowEl && arrow({ element: state?.arrowEl }),
       hide(), // will hide the attentionEl when it appears detached from the targetEl. Can be called multiple times in the middleware-array if you want to use several strategies. Default strategy is 'referenceHidden'.
       size({
         apply() {
@@ -200,12 +200,6 @@ export async function useRecompute(state: AttentionState) {
         // Default positioning with no 'start' or 'end'
         left = typeof arrowX === 'number' ? `${arrowX}px` : '';
         top = typeof arrowY === 'number' ? `${arrowY}px` : '';
-      }
-
-      // Adjust for shift if applied
-      const { x: shiftX } = middlewareData.shift || {};
-      if (typeof shiftX === 'number') {
-        left = typeof arrowX === 'number' ? `${arrowX - shiftX}px` : left;
       }
 
       // Apply the arrow styles
