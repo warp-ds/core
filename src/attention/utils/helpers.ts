@@ -156,11 +156,23 @@ export async function useRecompute(state: AttentionState) {
   }).then(({ x, y, middlewareData, placement }) => {
     state.actualDirection = placement;
 
+    // Get width and position for the target el.
+    const w = window.innerWidth;
+    const r = targetEl.getBoundingClientRect();
+
+    const centerPointX = r.left + (r.width / 2);
+
+    let width = w * 0.5;
+    if (width > 500) {
+      width = 500;
+    }
+
     // We only want floating-ui to calculate the callout's arrow position and not the attention element's position, since the targetEl can be undefined if isCallout is true.
     // Therefore, we only add this style to the attentionEl when isCallout is false.
     if (!state?.isCallout) {
       Object.assign(attentionEl.style, {
-        left: `${x}px`,
+        left: `${centerPointX * 0.5}px`,
+        width: `${width}px`,
         top: `${y}px`,
       });
     }
