@@ -1,6 +1,6 @@
 ## Warp JS Core
 
-This package contains shared business logic between our Warp JS implementations: [Web Components](https://github.com/warp-ds/elements), [React](https://github.com/warp-ds/react) and [Vue](https://github.com/warp-ds/vue).
+This module is no longer actively maintained. Instead [@warp-ds/elements](https://github.com/warp-ds/elements) based on web components is the canonical implementation other frameworks will use.
 
 ### Goals
 
